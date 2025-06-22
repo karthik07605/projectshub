@@ -1,4 +1,4 @@
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.conf import settings
 from email.utils import formataddr
 from django.db import models
@@ -14,7 +14,6 @@ from .cloudinary_utils import upload_to_cloudinary
 import logging
 import re
 import cloudinary
-from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
@@ -549,18 +548,22 @@ def reset_password(request):
             logger.warning(f"Password reset attempt for unregistered email {email_lower}")
             return JsonResponse({'status': 'Failed', 'message': 'Email not found'}, status=400)
         try:
+            logger.debug(f"DEFAULT_FROM_EMAIL: {settings.DEFAULT_FROM_EMAIL}")  # Debug email config
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             reset_link = f"{request.scheme}://{request.get_host()}/reset_password_confirm/{uid}/{token}/"
+            logger.debug(f"Password reset link: {reset_link}")  # Debug reset link
             subject = 'Password Reset Request'
             message = render_to_string('password_reset_email.html', {
                 'user': user,
                 'reset_link': reset_link,
+                'sent_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S %Z'),  # Add sent_time
             })
+            logger.debug(f"Rendered email content: {message}")  # Debug email content
             email_message = EmailMessage(
                 subject=subject,
                 body=message,
-                from_email=formataddr(('SeniorSync', settings.DEFAULT_FROM_EMAIL)),
+                from_email=formataddr(('Projects Zone', settings.DEFAULT_FROM_EMAIL)),
                 to=[email_lower]
             )
             email_message.content_subtype = 'html'
@@ -570,13 +573,15 @@ def reset_password(request):
         except Exception as e:
             logger.error(f"Error sending password reset email to {email_lower}: {str(e)}")
             return JsonResponse({'status': 'Failed', 'message': 'Failed to send reset email'}, status=500)
-    return render(request, 'reset_password.html')
+    return render(request, 'password_reset_request.html')
 
 def password_reset_confirm(request, uidb64, token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
+        logger.debug(f"Decoded UID: {uid}")  # Debug UID
         user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+        logger.error(f"Error decoding UID or finding user: {str(e)}")
         user = None
     if user is not None and default_token_generator.check_token(user, token):
         if request.method == 'POST':
@@ -629,22 +634,20 @@ def toggle_like(request):
             project = get_object_or_404(Project, id=project_id)
             like, created = Like.objects.get_or_create(user=request.user, project=project)
             if not created:
-                # Unlike: Remove the like
                 like.delete()
                 logger.info(f"User {request.user.username} unliked project {project.name}")
                 return JsonResponse({
                     'status': 'Success',
                     'message': 'Unliked',
-                    'like_count': project.like_count,  # Use the property to get the updated count
+                    'like_count': project.like_count,
                     'action': 'unliked'
                 })
             else:
-                # Like: The like was already created by get_or_create
                 logger.info(f"User {request.user.username} liked project {project.name}")
                 return JsonResponse({
                     'status': 'Success',
                     'message': 'Liked',
-                    'like_count': project.like_count,  # Use the property to get the updated count
+                    'like_count': project.like_count,
                     'action': 'liked'
                 })
         except Exception as e:
@@ -706,13 +709,11 @@ def delete_project(request):
                 logger.warning(f"User {request.user.username} attempted to delete project {project_id} they do not own")
                 return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to delete this project'}, status=403)
             
-            # Delete Cloudinary images
             if project.image_urls:
                 image_urls = project.image_urls.split(',')
                 for url in image_urls:
                     if url.strip():
                         try:
-                            # Extract public_id from Cloudinary URL
                             public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
                             if public_id_match:
                                 public_id = public_id_match.group(1)
@@ -726,13 +727,11 @@ def delete_project(request):
                         except Exception as e:
                             logger.error(f"Error deleting Cloudinary image {url}: {str(e)}")
             
-            # Delete Cloudinary videos
             if project.video_urls:
                 video_urls = project.video_urls.split(',')
                 for url in video_urls:
                     if url.strip():
                         try:
-                            # Extract public_id from Cloudinary URL
                             public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
                             if public_id_match:
                                 public_id = public_id_match.group(1)
@@ -747,11 +746,9 @@ def delete_project(request):
                             logger.error(f"Error deleting Cloudinary video {url}: {str(e)}")
             
             project_name = project.name
-            # Delete associated likes
             Like.objects.filter(project=project).delete()
             logger.info(f"Deleted likes for project {project_name}")
             
-            # Delete the project
             project.delete()
             logger.info(f"Project {project_name} deleted by user {request.user.username}")
             return JsonResponse({'status': 'Success', 'message': 'Project deleted successfully'})

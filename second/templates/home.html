@@ -1401,7 +1401,7 @@
         <div class="close-btn" onclick="toggleSideMenu()">
             <i class="fas fa-times"></i>
         </div>
-        <div class="menu-logo">SeniorSync Projects</div>
+        <div class="menu-logo">Projects Zone</div>
         <ul>
             <li><a href="#all" onclick="filterProjects('all'); toggleSideMenu();" class="nav-link active">All Projects</a></li>
             <li><a href="#iot" onclick="filterProjects('iot'); toggleSideMenu();" class="nav-link">IoT Projects</a></li>
@@ -1679,7 +1679,7 @@
             const baseUrl = window.location.origin;
             const url = type === 'project' ? `${baseUrl}/project/${id}/` : `${baseUrl}/team-request/${id}/`;
             const title = `Check out this ${type === 'project' ? 'project' : 'team request'}: ${name}`;
-            const text = `Explore "${name}" on SeniorSync Projects!`;
+            const text = `Explore "${name}" on Projects Zone ! `;
             
             if (navigator.share && navigator.canShare({ url })) {
                 navigator.share({
