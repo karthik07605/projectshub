@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-((oq0ob-b7*(05)tvj+tada1-6pi1z6vv_z85z9*z#!q=fw)yj'
 DEBUG = True
-ALLOWED_HOSTS = ['*','projectszone.pythonanywhere.com']
+ALLOWED_HOSTS = ['*','projectszone.pythonanywhere.com','projects-zone.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -152,6 +152,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 CSRF_TRUSTED_ORIGINS = [
     'https://code-demo-82rc.onrender.com',
     'http://code-demo-82rc.onrender.com',
+    'https://projects-zone.onrender.com',
 ]
 CSRF_COOKIE_SECURE = True
 
