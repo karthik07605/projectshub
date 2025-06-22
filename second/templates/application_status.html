@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Status - SeniorSync</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --bark-blue-50: #f0f4f8;
+            --bark-blue-100: #d9e6f2;
+            --bark-blue-200: #b3cce6;
+            --bark-blue-300: #8db3d9;
+            --bark-blue-400: #6699cc;
+            --bark-blue-500: #4080bf;
+            --bark-blue-600: #335c8a;
+            --bark-blue-700: #264555;
+            --bark-blue-800: #1a2e3f;
+            --bark-blue-900: #0d1720;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --light-blue: #dbeafe;
+            --border-light: #f1f5f9;
+            --shadow-sm: rgba(59, 130, 246, 0.12);
+            --shadow-md: rgba(59, 130, 246, 0.18);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bark-blue-50) 0%, var(--white) 100%);
+            color: var(--bark-blue-800);
+            min-height: 100vh;
+            line-height: 1.6;
+            animation: pageLoad 1s ease-out;
+        }
+
+        @keyframes pageLoad {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--bark-blue-600), var(--bark-blue-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--gray-500);
+            font-size: 1.1rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bark-blue-600);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background: var(--bark-blue-700);
+            transform: translateY(-2px);
+        }
+
+        .back-button i {
+            font-size: 1rem;
+        }
+
+        .applications-section {
+            background: var(--white);
+            border: 1px solid var(--bark-blue-100);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(64, 128, 191, 0.08);
+            animation: slideLeft 0.8s ease-out 0.6s both;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .applications-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .applications-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--bark-blue-400), var(--bark-blue-600));
+            border-radius: 2px;
+            margin-right: 12px;
+        }
+
+        .application-card {
+            background: linear-gradient(135deg, var(--bark-blue-50) 0%, var(--white) 100%);
+            border: 1px solid var(--bark-blue-100);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .application-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(64, 128, 191, 0.15);
+            border-color: var(--bark-blue-300);
+        }
+
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .application-header h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+        }
+
+        .application-status {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .application-status.pending {
+            background: var(--warning);
+            color: var(--white);
+        }
+
+        .application-status.accepted {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .application-status.rejected {
+            background: var(--error);
+            color: var(--white);
+        }
+
+        .application-details p {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        .no-applications {
+            text-align: center;
+            padding: 24px;
+            color: var(--gray-500);
+            font-size: 1rem;
+        }
+
+        .no-applications i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .back-button {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+
+            .applications-section {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .applications-title {
+                font-size: 1.5rem;
+            }
+
+            .application-card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .application-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .application-header h4 {
+                font-size: 1rem;
+            }
+
+            .application-status {
+                font-size: 0.85rem;
+                padding: 3px 10px;
+            }
+
+            .application-details p {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .back-button {
+                width: 100%;
+                justify-content: center;
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .applications-section {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .applications-title {
+                font-size: 1.3rem;
+            }
+
+            .applications-title::before {
+                height: 20px;
+                margin-right: 8px;
+            }
+
+            .application-card {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .application-header h4 {
+                font-size: 0.95rem;
+            }
+
+            .application-status {
+                font-size: 0.8rem;
+                padding: 3px 8px;
+            }
+
+            .application-details p {
+                font-size: 0.8rem;
+                margin-bottom: 6px;
+            }
+
+            .no-applications {
+                font-size: 0.9rem;
+                padding: 16px;
+            }
+
+            .no-applications i {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .header p {
+                font-size: 0.85rem;
+            }
+
+            .back-button {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+
+            .applications-section {
+                padding: 12px;
+            }
+
+            .applications-title {
+                font-size: 1.2rem;
+            }
+
+            .application-card {
+                padding: 10px;
+            }
+
+            .application-header h4 {
+                font-size: 0.9rem;
+            }
+
+            .application-status {
+                font-size: 0.75rem;
+                padding: 2px 6px;
+            }
+
+            .application-details p {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-button" onclick="history.back()">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+        <div class="header">
+            <h1>Application Status</h1>
+            <p>View the status of your team request applications</p>
+        </div>
+
+        <div class="applications-section">
+            <div class="applications-title">Your Applications</div>
+            {% if applications %}
+                {% for application in applications %}
+                <div class="application-card">
+                    <div class="application-header">
+                        <h4><a href="/team-request/{{ application.team_request.id }}/">{{ application.team_request.project_name }}</a></h4>
+                        <span class="application-status {{ application.status|lower }}">{{ application.status }}</span>
+                    </div>
+                    <div class="application-details">
+                        {% if application.message %}
+                        <p><strong>Message:</strong> {{ application.message }}</p>
+                        {% endif %}
+                        <p><strong>Applied On:</strong> {{ application.created_at|date:"F d, Y" }}</p>
+                        <p><strong>Posted By:</strong> {{ application.team_request.user.profile.name }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-applications">
+                    <i class="fas fa-folder-open"></i>
+                    You haven't applied to any team requests yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

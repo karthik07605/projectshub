@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.name }} - SeniorSync Projects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-color: #4a73c0; /* Soft pastel blue */
+            --secondary-color: #7ea3f0; /* Lighter pastel blue */
+            --accent-color: #b3c9f8; /* Very light blue */
+            --light-gray: #f0f2f5; /* Light gray for borders */
+            --lighter-gray: #f8f9fb; /* Almost white */
+            --text-primary: #1f2a3c; /* Soft dark gray */
+            --text-secondary: #6b7280; /* Light gray text */
+            --text-light: #9ca3af; /* Lighter gray text */
+            --bg-primary: #ffffff; /* White main background */
+            --bg-secondary: #ffffff; /* White for cards */
+            --bg-card: #ffffff;
+            --border-color: #e5e7eb; /* Very light gray */
+            --border-light: #f3f4f6; /* Almost white border */
+            --shadow-xs: rgba(74, 115, 192, 0.08); /* Soft blue shadow */
+            --shadow-sm: rgba(74, 115, 192, 0.12);
+            --shadow-md: rgba(74, 115, 192, 0.18);
+            --shadow-lg: rgba(74, 115, 192, 0.25);
+            --shadow-xl: rgba(74, 115, 192, 0.35);
+            --gradient-primary: linear-gradient(135deg, #4a73c0 0%, #7ea3f0 100%); /* Soft blue gradient */
+            --gradient-light: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%); /* White to light gray */
+            --gradient-card: linear-gradient(135deg, #ffffff 0%, #f8f9fb 100%);
+        }
+
+        body {
+            background: var(--gradient-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-weight: 400;
+            min-height: 100vh;
+            animation: pageLoad 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes pageLoad {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 24px;
+            background: var(--gradient-card);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px var(--shadow-xs);
+            border: 1px solid var(--border-light);
+            animation: cardFloat 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes cardFloat {
+            from { 
+                opacity: 0; 
+                transform: translateY(60px) rotateX(10deg); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) rotateX(0deg); 
+            }
+        }
+
+        .project-details {
+            flex: 1;
+        }
+
+        .project-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            position: relative;
+            display: inline-block;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .project-title::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background: var(--gradient-primary);
+            bottom: -6px;
+            left: 0;
+            border-radius: 2px;
+            animation: underlineGrow 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+        }
+
+        @keyframes underlineGrow {
+            from { 
+                width: 0; 
+                opacity: 0; 
+            }
+            to { 
+                width: 80px; 
+                opacity: 1; 
+            }
+        }
+
+        .project-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px var(--shadow-sm);
+            transition: transform 0.4s ease;
+        }
+
+        .project-image:hover {
+            transform: scale(1.02);
+        }
+
+        .no-image {
+            width: 100%;
+            max-height: 400px;
+            background: var(--light-gray);
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            box-shadow: 0 4px 12px var(--shadow-sm);
+        }
+
+        .project-meta {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .project-meta .label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .project-description {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .github-link {
+            font-size: 14px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .github-link:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        .video-section {
+            margin-top: 24px;
+        }
+
+        .video-section h2 {
+            font-size: 20px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            position: relative;
+            display: inline-block;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .video-section h2::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-primary);
+            bottom: -4px;
+            left: 0;
+            border-radius: 2px;
+            animation: underlineGrow 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+        }
+
+        .video-section video {
+            width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px var(--shadow-sm);
+            transition: transform 0.4s ease;
+        }
+
+        .video-section video:hover {
+            transform: scale(1.02);
+        }
+
+        button {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px var(--shadow-sm);
+            margin-top: 16px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px var(--shadow-md);
+        }
+
+        button:active {
+            transform: translateY(0);
+            background: var(--primary-color);
+        }
+
+        .back-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 4px 12px var(--shadow-xs);
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px var(--shadow-md);
+        }
+
+        .back-btn:active {
+            transform: translateY(0);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin: 24px auto;
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .project-title {
+                font-size: 22px;
+            }
+
+            .project-title::after {
+                width: 60px;
+                height: 3px;
+                bottom: -4px;
+            }
+
+            .project-image, .no-image {
+                max-height: 300px;
+                border-radius: 8px;
+            }
+
+            .project-meta {
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+
+            .project-description {
+                font-size: 14px;
+                margin-bottom: 16px;
+            }
+
+            .github-link {
+                font-size: 12px;
+            }
+
+            .video-section {
+                margin-top: 16px;
+            }
+
+            .video-section h2 {
+                font-size: 12px;
+            }
+
+            .video-section h2::after {
+                width: 50px;
+                height: 2px;
+                bottom: -3px;
+            }
+
+            .video-section video {
+                max-height: 300px;
+                border-radius: 8px;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 10px;
+                border-radius: 8px;
+                min-width: 44px;
+                min-height: 44px;
+                margin-top: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                margin: 16px auto;
+                padding: 16px;
+                border-radius: 14px;
+            }
+
+            .project-title {
+                font-size: 20px;
+            }
+
+            .project-title::after {
+                width: 50px;
+                height: 2px;
+                bottom: -3px;
+            }
+
+            .project-image, .no-image {
+                max-height: 200px;
+                border-radius: 6px;
+            }
+
+            .project-meta {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+
+            .project-description {
+                font-size: 12px;
+                margin-bottom: 12px;
+            }
+
+            .github-link {
+                font-size: 10px;
+            }
+
+            .video-section {
+                margin-top: 12px;
+            }
+
+            .video-section h2 {
+                font-size: 11px;
+            }
+
+            .video-section h2::after {
+                width: 40px;
+                height: 2px;
+                bottom: -2px;
+            }
+
+            .video-section video {
+                max-height: 200px;
+                border-radius: 6px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 8px;
+                border-radius: 6px;
+                min-width: 40px;
+                min-height: 40px;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .main-content {
+                margin: 12px;
+                padding: 12px;
+                border-radius: 4px;
+            }
+
+            .project-title {
+                font-size: 16px;
+            }
+
+            .project-title::after {
+                width: 40px;
+                height: 2px;
+                bottom: -2px;
+            }
+
+            .project-image, .no-image {
+                max-height: 150px;
+                border-radius: 4px;
+            }
+
+            .project-meta {
+                font-size: 10px;
+                margin-bottom: 6px;
+            }
+
+            .project-description {
+                font-size: 10px;
+                margin-bottom: 10px;
+            }
+
+            .github-link {
+                font-size: 10px;
+            }
+
+            .video-section {
+                margin-top: 10px;
+            }
+
+            .video-section h2 {
+                font-size: 10px;
+            }
+
+            .video-section h2::after {
+                width: 30px;
+                height: 1px;
+                bottom: -1px;
+            }
+
+            .video-section video {
+                max-height: 150px;
+                border-radius: 4px;
+            }
+
+            button {
+                padding: 6px 10px;
+                font-size: 7px;
+                border-radius: 5px;
+                min-width: 36px;
+                min-height: 36px;
+                margin-top: 8px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        @media (max-width: 767px) {
+            ::-webkit-scrollbar {
+                width: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="main-content">
+            <div class="project-details">
+                <h1 class="project-title">{{ project.name }}</h1>
+                {% if project.images_list %}
+                    {% for url in project.images_list %}
+                    <img src="{{ url }}" loading="lazy" alt="{{ project.name }}" class="project-image" onerror="this.src='https://via.placeholder.com/300x400?text=Image+Failed';">
+                    {% endfor %}
+                {% else %}
+                <div class="no-image">No Image</div>
+                {% endif %}
+                <p class="project-meta"><span class="label">Type:</span> {{ project.type }}</p>
+                <p class="project-meta"><span class="label">By:</span> {{ project.user.profile.name }}</p>
+                <p class="project-meta"><span class="label">Email:</span> {{ project.user.email }}</p>
+                <p class="project-meta"><span class="label">Date:</span> {{ project.created_at|date:"F d, Y H:i" }}</p>
+                {% if project.github_link %}
+                    <a href="{{ project.github_link }}" class="github-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+                {% endif %}
+                <p class="project-description">{{ project.description }}</p>
+                {% if project.videos_list %}
+                    <div class="video-section">
+                        <h2>Videos</h2>
+                        {% for video_url in project.videos_list %}
+                        <video class="project-video" preload="none" poster="https://via.placeholder.com/300x400?text=Click+to+Play" controls>
+                            <source src="{{ video_url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <button type="button" class="back-btn" onclick="window.history.back()">Back</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

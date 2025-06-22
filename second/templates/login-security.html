@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Security</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #60a5fa;
+            --light-blue: #dbeafe;
+            --lighter-blue: #f0f7ff;
+            --dark-blue: #1e40af;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-xs: rgba(59, 130, 246, 0.08);
+            --shadow-sm: rgba(59, 130, 246, 0.12);
+            --shadow-md: rgba(59, 130, 246, 0.18);
+            --shadow-lg: rgba(59, 130, 246, 0.25);
+            --shadow-xl: rgba(59, 130, 246, 0.35);
+            --gradient-primary: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            --gradient-light: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --gradient-card: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        body {
+            background: var(--gradient-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-weight: 400;
+            min-height: 100vh;
+            animation: pageLoad 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes pageLoad {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 24px;
+            background: var(--gradient-card);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px var(--shadow-xs);
+            border: 1px solid var(--border-light);
+            animation: cardFloat 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes cardFloat {
+            from { 
+                opacity: 0; 
+                transform: translateY(60px) rotateX(10deg); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) rotateX(0deg); 
+            }
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            position: relative;
+            display: inline-block;
+            letter-spacing: -0.8px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 5px;
+            background: var(--gradient-primary);
+            bottom: -12px;
+            left: 0;
+            border-radius: 3px;
+            animation: underlineGrow 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+        }
+
+        @keyframes underlineGrow {
+            from { 
+                width: 0; 
+                opacity: 0; 
+            }
+            to { 
+                width: 100px; 
+                opacity: 1; 
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            background: var(--bg-secondary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px var(--shadow-xs);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 8px 32px var(--shadow-sm), 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+            background: var(--bg-secondary);
+        }
+
+        input::placeholder {
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        button {
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 16px var(--shadow-sm);
+            margin-right: 12px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px var(--shadow-md);
+        }
+
+        button:active {
+            transform: translateY(0);
+            background: var(--primary-color);
+        }
+
+        .back-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 4px 16px var(--shadow-xs);
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px var(--shadow-md);
+        }
+
+        .back-btn:active {
+            transform: translateY(0);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .message {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #DC3545;
+            display: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .message.success {
+            color: #28A745;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            h1::after {
+                width: 60px;
+                height: 3px;
+                bottom: -8px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            label {
+                font-size: 14px;
+            }
+
+            input {
+                padding: 12px 14px;
+                font-size: 13px;
+                border-radius: 10px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 13px;
+                min-width: 44px;
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 16px auto;
+                padding: 16px;
+                border-radius: 14px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin-bottom: 16px;
+            }
+
+            h1::after {
+                width: 50px;
+                height: 2px;
+                bottom: -6px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            input {
+                padding: 10px 12px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 12px;
+                min-width: 40px;
+                min-height: 40px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                margin: 12px auto;
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 12px;
+            }
+
+            h1::after {
+                width: 40px;
+                height: 2px;
+                bottom: -4px;
+            }
+
+            .form-group {
+                margin-bottom: 10px;
+            }
+
+            label {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            input {
+                padding: 8px 10px;
+                font-size: 11px;
+                border-radius: 6px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 11px;
+                min-width: 36px;
+                min-height: 36px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            ::-webkit-scrollbar {
+                width: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login & Security</h1>
+        <form id="editProfileForm" method="POST" action="/update-profile/">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="{{ profile.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile Number</label>
+                <input type="tel" id="mobile" name="mobile" value="{{ profile.mobile }}" pattern="[0-9]{10,12}" required>
+            </div>
+            <button type="submit">Save Changes</button>
+            <button type="button" class="back-btn" onclick="window.history.back()">Back</button>
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+
+    <script>
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/update-profile/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                body: new URLSearchParams(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const message = document.getElementById('message');
+                if (data.status === 'Success') {
+                    message.classList.add('success');
+                    message.textContent = 'Profile updated successfully!';
+                } else {
+                    message.classList.remove('success');
+                    message.textContent = data.message || 'Error updating profile.';
+                }
+                message.style.display = 'block';
+                setTimeout(() => message.style.display = 'none', 3000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const message = document.getElementById('message');
+                message.classList.remove('success');
+                message.textContent = 'An error occurred.';
+                message.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

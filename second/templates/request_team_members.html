@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if team_request %}Edit{% else %}Request{% endif %} Team Members - SeniorSync</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --bark-blue-50: #f0f4f8;
+            --bark-blue-100: #d9e6f2;
+            --bark-blue-200: #b3cce6;
+            --bark-blue-300: #8db3d9;
+            --bark-blue-400: #6699cc;
+            --bark-blue-500: #4080bf;
+            --bark-blue-600: #335c8a;
+            --bark-blue-700: #264555;
+            --bark-blue-800: #1a2e3f;
+            --bark-blue-900: #0d1720;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bark-blue-50) 0%, var(--white) 100%);
+            color: var(--bark-blue-800);
+            min-height: 100vh;
+            line-height: 1.6;
+            animation: pageLoad 1s ease-out;
+        }
+
+        @keyframes pageLoad {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--bark-blue-600), var(--bark-blue-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--gray-500);
+            font-size: 1rem;
+        }
+
+        .form-card {
+            background: linear-gradient(135deg, var(--white) 0%, var(--bark-blue-50) 100%);
+            border: 1px solid var(--bark-blue-200);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(64, 128, 191, 0.1);
+            backdrop-filter: blur(10px);
+            animation: slideRight 0.8s ease-out 0.4s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--bark-blue-400), var(--bark-blue-500), var(--bark-blue-600));
+            border-radius: 20px 20px 0 0;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--bark-blue-200);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--bark-blue-700);
+            background: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--bark-blue-400);
+            box-shadow: 0 4px 15px rgba(64, 128, 191, 0.15);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--bark-blue-400), var(--bark-blue-600));
+            color: var(--white);
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(64, 128, 191, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+            background: var(--bark-blue-600);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header {
+                margin-bottom: 24px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .submit-btn {
+                padding: 12px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .form-card {
+                padding: 16px;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+
+            .submit-btn {
+                font-size: 0.9rem;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{% if team_request %}Edit{% else %}Request{% endif %} Team Members</h1>
+            <p>Post a request to find team members for your project</p>
+        </div>
+
+        <div class="form-card">
+            <form id="teamRequestForm" method="POST" action="{% if team_request %}/edit-team-request/{{ team_request.id }}/{% else %}/request-team-members/{% endif %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="project_name">Project Name</label>
+                    <input type="text" id="project_name" name="project_name" value="{% if team_request %}{{ team_request.project_name }}{% endif %}" required>
+                    <div class="error-message" id="project_name_error">Project name is required</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Project Description</label>
+                    <textarea id="description" name="description" required>{% if team_request %}{{ team_request.description }}{% endif %}</textarea>
+                    <div class="error-message" id="description_error">Description is required</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="team_size">Team Size Needed</label>
+                    <input type="number" id="team_size" name="team_size" min="1" value="{% if team_request %}{{ team_request.team_size }}{% endif %}" required>
+                    <div class="error-message" id="team_size_error">Please enter a valid team size</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="required_skills">Required Skills (comma-separated)</label>
+                    <input type="text" id="required_skills" name="required_skills" value="{% if team_request %}{{ team_request.required_skills }}{% endif %}" placeholder="e.g., Python, Django, JavaScript" required>
+                    <div class="error-message" id="required_skills_error">Required skills are required</div>
+                </div>
+
+                <button type="submit" class="submit-btn">{% if team_request %}Update{% else %}Submit{% endif %} Request</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('teamRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const projectName = document.getElementById('project_name').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const teamSize = document.getElementById('team_size').value;
+            const requiredSkills = document.getElementById('required_skills').value.trim();
+
+            let isValid = true;
+
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+            if (!projectName) {
+                document.getElementById('project_name_error').style.display = 'block';
+                isValid = false;
+            }
+            if (!description) {
+                document.getElementById('description_error').style.display = 'block';
+                isValid = false;
+            }
+            if (!teamSize || teamSize < 1) {
+                document.getElementById('team_size_error').style.display = 'block';
+                isValid = false;
+            }
+            if (!requiredSkills) {
+                document.getElementById('required_skills_error').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(new FormData(form)).toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'Success') {
+                    alert(data.message);
+                    window.location.href = data.redirect || '/userprofile/';
+                } else {
+                    alert(data.message || 'An error occurred while submitting your request.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting your request.');
+            });
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Team Requests - SeniorSync</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --bark-blue-50: #f0f4f8;
+            --bark-blue-100: #d9e6f2;
+            --bark-blue-200: #b3cce6;
+            --bark-blue-300: #8db3d9;
+            --bark-blue-400: #6699cc;
+            --bark-blue-500: #4080bf;
+            --bark-blue-600: #335c8a;
+            --bark-blue-700: #264555;
+            --bark-blue-800: #1a2e3f;
+            --bark-blue-900: #0d1720;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bark-blue-50) 0%, var(--white) 100%);
+            color: var(--bark-blue-800);
+            min-height: 100vh;
+            line-height: 1.6;
+            animation: pageLoad 1s ease-out;
+        }
+
+        @keyframes pageLoad {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--bark-blue-600), var(--bark-blue-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--gray-500);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .account-options {
+            background: linear-gradient(135deg, var(--white) 0%, var(--bark-blue-50) 100%);
+            border: 1px solid var(--bark-blue-200);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(64, 128, 191, 0.1);
+            backdrop-filter: blur(10px);
+            animation: slideLeft 0.8s ease-out 0.6s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .account-options::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--bark-blue-400), var(--bark-blue-500), var(--bark-blue-600));
+            border-radius: 20px 20px 0 0;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .options-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .options-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--bark-blue-400), var(--bark-blue-600));
+            border-radius: 2px;
+            margin-right: 12px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .option-card {
+            background: var(--white);
+            border: 1px solid var(--bark-blue-100);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(64, 128, 191, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .option-card:nth-child(1) { animation-delay: 0.8s; }
+        .option-card:nth-child(2) { animation-delay: 0.9s; }
+        .option-card:nth-child(3) { animation-delay: 1.0s; }
+        .option-card:nth-child(4) { animation-delay: 1.1s; }
+        .option-card:nth-child(5) { animation-delay: 1.2s; }
+        .option-card:nth-child(6) { animation-delay: 1.3s; }
+        .option-card:nth-child(7) { animation-delay: 1.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(64, 128, 191, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .option-card:hover::before {
+            left: 100%;
+        }
+
+        .option-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(64, 128, 191, 0.2);
+            border-color: var(--bark-blue-300);
+        }
+
+        .option-card:active {
+            transform: translateY(-4px) scale(0.98);
+        }
+
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--bark-blue-100), var(--bark-blue-200));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover .option-icon {
+            background: linear-gradient(135deg, var(--bark-blue-400), var(--bark-blue-500));
+            transform: rotate(5deg) scale(1.1);
+            box-shadow: 0 8px 20px rgba(64, 128, 191, 0.3);
+        }
+
+        .option-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .option-card:hover h3 {
+            color: var(--bark-blue-600);
+        }
+
+        .option-card p {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+            line-height: 1.5;
+            transition: color 0.3s ease;
+            word-break: break-word;
+        }
+
+        .option-card:hover p {
+            color: var(--gray-600);
+        }
+
+        .application-card {
+            background: linear-gradient(135deg, var(--bark-blue-50) 0%, var(--white) 100%);
+            border: 1px solid var(--bark-blue-100);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .application-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(64, 128, 191, 0.15);
+            border-color: var(--bark-blue-300);
+        }
+
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .applicant-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .applicant-email {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            word-break: break-all;
+        }
+
+        .application-header h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            margin: 0;
+        }
+
+        .application-status {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .application-status.pending {
+            background: var(--warning);
+            color: var(--white);
+        }
+
+        .application-status.accepted {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .application-status.rejected {
+            background: var(--error);
+            color: var(--white);
+        }
+
+        .application-message {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .application-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .application-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-align: center;
+        }
+
+        .application-btn.accept {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .application-btn.reject {
+            background: var(--error);
+            color: var(--white);
+        }
+
+        .application-btn.edit {
+            background: var(--bark-blue-400);
+            color: var(--white);
+        }
+
+        .application-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-applications {
+            text-align: center;
+            padding: 24px;
+            color: var(--gray-500);
+            font-size: 1rem;
+        }
+
+        .no-applications i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bark-blue-600);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background: var(--bark-blue-700);
+            transform: translateY(-2px);
+        }
+
+        .back-button i {
+            font-size: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .options-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header {
+                margin-bottom: 24px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 4px;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .account-options {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .options-title {
+                font-size: 1.2rem;
+                margin-bottom: 16px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .option-card {
+                padding: 16px;
+                border-radius: 12px;
+                min-height: auto;
+            }
+
+            .option-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+                border-radius: 8px;
+            }
+
+            .option-card h3 {
+                font-size: 1rem;
+                margin-bottom: 6px;
+            }
+
+            .option-card p {
+                font-size: 0.85rem;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .application-card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .application-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .applicant-email {
+                font-size: 0.8rem;
+            }
+
+            .application-status {
+                font-size: 0.85rem;
+                padding: 3px 10px;
+            }
+
+            .application-message {
+                font-size: 0.85rem;
+            }
+
+            .application-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .application-btn {
+                padding: 8px;
+                font-size: 0.85rem;
+                width: 100%;
+            }
+
+            .back-button {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .account-options {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .options-title {
+                font-size: 1.1rem;
+            }
+
+            .options-grid {
+                gap: 10px;
+            }
+
+            .option-card {
+                padding: 12px;
+                border-radius: 10px;
+            }
+
+            .option-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+                margin-bottom: 6px;
+            }
+
+            .option-card h3 {
+                font-size: 0.9rem;
+                margin-bottom: 4px;
+            }
+
+            .option-card p {
+                font-size: 0.8rem;
+                -webkit-line-clamp: 2;
+            }
+
+            .application-card {
+                padding: 12px;
+            }
+
+            .applicant-email {
+                font-size: 0.75rem;
+            }
+
+            .application-header h4 {
+                font-size: 1rem;
+            }
+
+            .application-status {
+                font-size: 0.8rem;
+                padding: 2px 8px;
+            }
+
+            .application-message {
+                font-size: 0.8rem;
+            }
+
+            .application-btn {
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+
+            .back-button {
+                width: 100%;
+                justify-content: center;
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .options-title {
+                font-size: 1rem;
+            }
+
+            .options-grid {
+                gap: 8px;
+            }
+
+            .option-card {
+                padding: 10px;
+                border-radius: 8px;
+            }
+
+            .option-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+                margin-bottom: 4px;
+            }
+
+            .option-card h3 {
+                font-size: 0.85rem;
+            }
+
+            .option-card p {
+                font-size: 0.75rem;
+            }
+
+            .application-card {
+                padding: 10px;
+            }
+
+            .applicant-email {
+                font-size: 0.7rem;
+            }
+
+            .application-header h4 {
+                font-size: 0.95rem;
+            }
+
+            .application-status {
+                font-size: 0.75rem;
+                padding: 2px 6px;
+            }
+
+            .application-btn {
+                padding: 5px;
+                font-size: 0.75rem;
+            }
+
+            .back-button {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+        }
+
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out 2s both;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-button" onclick="history.back()">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+        <!-- Header -->
+        <div class="header">
+            <h1>Your Team Requests</h1>
+            <p>Manage your team member requests and applications</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Team Requests Section -->
+            <div class="account-options">
+                <div class="options-title">Team Member Requests</div>
+                <div style="margin-bottom: 16px;">
+                    <button class="application-btn accept" onclick="navigateTo('/request-team-members/')" aria-label="Create new team member request" style="width: auto;">Create New Request</button>
+                </div>
+                {% if team_requests %}
+                    <div class="options-grid">
+                        {% for team_request in team_requests %}
+                            <div class="option-card">
+                                <div class="option-icon">🤝</div>
+                                <h3>{{ team_request.project_name }}</h3>
+                                <p>{{ team_request.description|truncatewords:20 }}</p>
+                                <p><strong>Team Size Needed:</strong> {{ team_request.team_size }} member{{ team_request.team_size|pluralize }}</p>
+                                <p><strong>Skills:</strong> {{ team_request.required_skills }}</p>
+                                <p><strong>Posted On:</strong> {{ team_request.created_at|date:"F d, Y" }}</p>
+                                <div class="application-actions" style="margin-top: 12px;">
+                                    <button class="application-btn accept" onclick="navigateTo('/team-request/{{ team_request.id }}/')" aria-label="View details of {{ team_request.project_name }}">View Details</button>
+                                    <button class="application-btn edit" onclick="navigateTo('/edit-team-request/{{ team_request.id }}/')" aria-label="Edit {{ team_request.project_name }}">Edit</button>
+                                    <button class="application-btn reject" onclick="if(confirm('Are you sure you want to delete this request?')) deleteRequest({{ team_request.id }})" aria-label="Delete {{ team_request.project_name }}">Delete</button>
+                                </div>
+                                <!-- Applicants -->
+                                <div style="margin-top: 16px;">
+                                    <h4 style="font-size: 1rem; font-weight: 600; color: var(--bark-blue-700); margin-bottom: 8px;">Applicants</h4>
+                                    {% if team_request.applications.exists %}
+                                        {% for application in team_request.applications.all %}
+                                            <div class="application-card" style="margin-bottom: 12px;">
+                                                <div class="application-header">
+                                                    <div class="applicant-info">
+                                                        <h4>{{ application.user.profile.name }}</h4>
+                                                        <span class="applicant-email">{{ application.user.email }}</span>
+                                                    </div>
+                                                    <span class="application-status {{ application.status|lower }}">{{ application.status }}</span>
+                                                </div>
+                                                {% if application.message %}
+                                                    <div class="application-message">
+                                                        <strong>Message:</strong> {{ application.message|truncatewords:15 }}
+                                                    </div>
+                                                {% endif %}
+                                                <!-- Applicant's Projects -->
+                                                <div style="margin-top: 8px;">
+                                                    <strong>Projects by {{ application.user.profile.name }}:</strong>
+                                                    {% with projects=application.user.project_set.all %}
+                                                        {% if projects %}
+                                                            <ul style="list-style-type: none; padding-left: 5px; font-size: 0.9rem; color: var(--gray-600);">
+                                                                {% for project in projects %}
+                                                                    <li style="margin-bottom: 4px;">
+                                                                        <a href="/project/{{ project.id }}/" style="color: var(--bark-blue-500); text-decoration: none;">{{ project.name }}</a>
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        {% else %}
+                                                            <p style="font-size: 0.9rem; color: var(--gray-500);">No projects uploaded.</p>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                                {% if application.status == 'Pending' %}
+                                                    <div class="application-actions" style="margin-top: 12px;">
+                                                        <button class="application-btn accept" onclick="manageApplication({{ application.id }}, 'accept')" aria-label="Accept application from {{ application.user.profile.name }}">Accept</button>
+                                                        <button class="application-btn reject" onclick="manageApplication({{ application.id }}, 'reject')" aria-label="Reject application from {{ application.user.profile.name }}">Reject</button>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="no-applications">
+                                            <i class="fas fa-folder-open"></i>
+                                            No applications received yet.
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-applications">
+                        <i class="fas fa-folder-open"></i>
+                        You have not posted any team member requests yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (const cookie of cookies) {
+                    const trimmedCookie = cookie.trim();
+                    if (trimmedCookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(trimmedCookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function deleteRequest(requestId) {
+            fetch('/delete-team-request/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({ request_id: requestId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'Success') {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'An error occurred while deleting the request.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the request.');
+            });
+        }
+
+        function manageApplication(applicationId, action) {
+            fetch('/manage-team-application/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({ application_id: applicationId, action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'Success') {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'An error occurred while processing the application.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing the application.');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const optionCards = document.querySelectorAll('.option-card');
+            optionCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

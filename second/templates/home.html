@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects Zone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #60a5fa;
+            --light-blue: #dbeafe;
+            --lighter-blue: #f0f7ff;
+            --dark-blue: #1e40af;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-xs: rgba(59, 130, 246, 0.08);
+            --shadow-sm: rgba(59, 130, 246, 0.12);
+            --shadow-md: rgba(59, 130, 246, 0.18);
+            --shadow-lg: rgba(59, 130, 246, 0.25);
+            --shadow-xl: rgba(59, 130, 246, 0.35);
+            --gradient-primary: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            --gradient-light: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --gradient-card: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            background: var(--gradient-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-weight: 400;
+            overflow-x: hidden;
+            min-height: 100vh;
+            animation: pageLoad 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes pageLoad {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            color: var(--text-primary);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 8px 32px var(--shadow-sm);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header.scrolled {
+            padding: 12px 20px;
+            box-shadow: 0 12px 40px var(--shadow-md);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .logo:hover {
+            transform: scale(1.05) translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logo:hover::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--primary-color);
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hamburger:hover {
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            display: flex;
+            max-width: 600px;
+            margin: 0 24px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 16px 56px 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            background: var(--bg-secondary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px var(--shadow-xs);
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 8px 32px var(--shadow-sm), 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+            background: var(--bg-secondary);
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 6px;
+            top: 6px;
+            background: var(--gradient-primary);
+            border: none;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px var(--shadow-sm);
+        }
+
+        .search-bar button i {
+            color: white;
+            font-size: 16px;
+        }
+
+        .search-bar button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--shadow-md);
+            filter: brightness(1.1);
+        }
+
+        .search-bar button:active {
+            transform: translateY(0);
+            background: var(--primary-color);
+        }
+
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-icon, .notification-icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--secondary-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 10px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-icon::before, .notification-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light-blue);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .user-icon:hover::before, .notification-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .user-icon:hover, .notification-icon:hover {
+            transform: scale(1.15) rotate(5deg);
+            color: var(--primary-color);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--error);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid var(--bg-secondary);
+            transform: translate(25%, -25%);
+            transition: all 0.3s ease;
+        }
+
+        .notification-icon:hover .notification-badge {
+            transform: translate(25%, -25%) scale(1.1);
+        }
+
+        .login-btn, .logout-btn {
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 16px var(--shadow-sm);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px var(--shadow-md);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+            background: var(--primary-color);
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 4px 16px var(--shadow-xs);
+        }
+
+        .logout-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px var(--shadow-md);
+        }
+
+        .logout-btn:active {
+            transform: translateY(0);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            height: 100%;
+            background: var(--bg-secondary);
+            box-shadow: 4px 0 16px var(--shadow-sm);
+            z-index: 1001;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .side-menu .close-btn {
+            font-size: 24px;
+            color: var(--primary-color);
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .side-menu .close-btn:hover {
+            transform: rotate(90deg);
+            color: var(--secondary-color);
+        }
+
+        .side-menu .menu-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .side-menu ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .side-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .side-menu a:hover,
+        .side-menu a.active {
+            background: var(--light-blue);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .side-menu .auth-section {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            margin-top: 100px;
+            box-shadow: 0 4px 24px var(--shadow-xs);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 85px;
+            z-index: 999;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-bar ul {
+            list-style: none;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .nav-bar a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light-blue);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .nav-bar a:hover::before,
+        .nav-bar a.active::before {
+            transform: scaleX(1);
+        }
+
+        .nav-bar a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: 4px;
+            left: 50%;
+            background: var(--gradient-primary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 2px;
+            transform: translateX(-50%);
+        }
+
+        .nav-bar a:hover::after,
+        .nav-bar a.active::after {
+            width: 60%;
+        }
+
+        .nav-bar a:hover,
+        .nav-bar a.active {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .notification-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px var(--shadow-xs);
+            animation: fadeIn 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .notification-section h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .notification-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--lighter-blue) 100%);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .notification-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px var(--shadow-sm);
+        }
+
+        .notification-message {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .notification-message a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .notification-message a:hover {
+            text-decoration: underline;
+        }
+
+        .notification-status {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .notification-status.accepted {
+            background: var(--success);
+            color: var(--bg-secondary);
+        }
+
+        .notification-status.rejected {
+            background: var(--error);
+            color: var(--bg-secondary);
+        }
+
+        .no-notifications {
+            text-align: center;
+            padding: 16px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .category-title {
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+            animation: titleSlide 1s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: -1px;
+        }
+
+        .category-title::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 5px;
+            background: var(--gradient-primary);
+            bottom: -12px;
+            left: 0;
+            border-radius: 3px;
+            animation: underlineGrow 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+        }
+
+        @keyframes titleSlide {
+            from { 
+                transform: translateX(-60px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateX(0); 
+                opacity: 1; 
+            }
+        }
+
+        @keyframes underlineGrow {
+            from { 
+                width: 0; 
+                opacity: 0; 
+            }
+            to { 
+                width: 100px; 
+                opacity: 1; 
+            }
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            animation: gridFadeIn 1s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;
+        }
+
+        @keyframes gridFadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(40px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .project-card {
+            background: var(--gradient-card);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px var(--shadow-xs);
+            border: 1px solid var(--border-light);
+            animation: cardFloat 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            animation-fill-mode: both;
+            transform-style: preserve-3d;
+        }
+
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.2s; }
+        .project-card:nth-child(3) { animation-delay: 0.3s; }
+        .project-card:nth-child(4) { animation-delay: 0.4s; }
+        .project-card:nth-child(5) { animation-delay: 0.5s; }
+        .project-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes cardFloat {
+            from { 
+                opacity: 0; 
+                transform: translateY(60px) rotateX(10deg); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) rotateX(0deg); 
+            }
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(30, 58, 138, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 24px 64px var(--shadow-lg);
+            border-color: var(--accent-color);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            background: linear-gradient(135deg, var(--lighter-blue), #f8fafc);
+            padding: 16px;
+            display: block;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.8s;
+        }
+
+        .project-card:hover .project-image::after {
+            left: 100%;
+        }
+
+        .project-card:hover .project-image {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .project-details {
+            padding: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .project-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: block;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.3;
+            letter-spacing: -0.3px;
+        }
+
+        .project-title:hover {
+            color: var(--secondary-color);
+            transform: translateX(4px);
+        }
+
+        .project-title:active {
+            color: var(--primary-color);
+        }
+
+        .project-type, .posted-by, .posted-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .project-type:hover, .posted-by:hover, .posted-date:hover {
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .project-type:active, .posted-by:active, .posted-date:active {
+            color: var(--secondary-color);
+        }
+
+        .project-type i, .posted-by i, .posted-date i {
+            margin-right: 12px;
+            color: var(--secondary-color);
+            width: 18px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .like-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 10px;
+            border-radius: 50%;
+            color: var(--text-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .like-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(220, 38, 38, 0.1), transparent);
+            transform: scale(0);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+        }
+
+        .like-btn:hover::before {
+            transform: scale(1);
+        }
+
+        .like-btn:hover {
+            transform: scale(1.2);
+            color: var(--secondary-color);
+        }
+
+        .like-btn:active {
+            transform: scale(1);
+            color: #dc2626;
+        }
+
+        .like-btn.clicked {
+            animation: heartBeat 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #dc2626;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.4) rotate(-5deg); }
+            50% { transform: scale(1.6) rotate(5deg); }
+            75% { transform: scale(1.2) rotate(-2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .like-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .like-btn:hover + .like-count {
+            color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .no-projects {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            border: 2px dashed var(--border-color);
+            animation: fadeIn 1s ease;
+        }
+
+        .no-projects i {
+            font-size: 56px;
+            color: var(--accent-color);
+            margin-bottom: 24px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .footer {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            margin-top: 80px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 -8px 32px var(--shadow-xs);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-address, .footer-contact {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-address h4, .footer-contact h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+        }
+
+        .footer-address p, .footer-contact p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .footer-contact a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-contact a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 16px;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .hamburger {
+                display: block;
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .search-bar {
+                flex-grow: 1;
+                margin: 0 8px;
+            }
+
+            .search-bar input {
+                font-size: 14px;
+                padding: 12px 48px 12px 16px;
+                border-radius: 12px;
+                -webkit-appearance: none;
+            }
+
+            .search-bar button {
+                padding: 8px 12px;
+                right: 4px;
+                top: 4px;
+                min-width: 40px;
+                min-height: 40px;
+            }
+
+            .auth-section {
+                display: none;
+            }
+
+            .nav-bar {
+                display: none;
+            }
+
+            .main-content {
+                padding: 0 16px;
+                margin: 80px auto 24px;
+            }
+
+            .notification-section {
+                padding: 16px;
+            }
+
+            .notification-section h3 {
+                font-size: 1.3rem;
+            }
+
+            .notification-card {
+                padding: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .notification-message {
+                font-size: 0.9rem;
+            }
+
+            .notification-status {
+                font-size: 0.85rem;
+            }
+
+            .category-title {
+                margin-top:20px;
+                top:10px;
+                font-size: 28px;
+                margin-bottom: 24px;
+            }
+
+            .category-title::after {
+                width: 60px;
+                height: 3px;
+                bottom: -8px;
+            }
+
+            .project-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .project-card {
+                border-radius: 16px;
+                box-shadow: 0 4px 16px var(--shadow-xs);
+                min-height: 360px;
+            }
+
+            .project-card:hover {
+                transform: none;
+                box-shadow: 0 6px 20px var(--shadow-sm);
+            }
+
+            .project-card:active {
+                transform: scale(0.98);
+                box-shadow: 0 2px 8px var(--shadow-xs);
+            }
+
+            .project-image {
+                height: 160px;
+                padding: 12px;
+            }
+
+            .project-details {
+                padding: 20px;
+            }
+
+            .project-title {
+                font-size: 18px;
+                margin-bottom: 12px;
+            }
+
+            .project-type, .posted-by, .posted-date {
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+
+            .project-type i, .posted-by i, .posted-date i {
+                margin-right: 8px;
+                font-size: 14px;
+            }
+
+            .like-section {
+                margin-top: 16px;
+                padding-top: 12px;
+                gap: 12px;
+            }
+
+            .like-btn {
+                font-size: 20px;
+                padding: 8px;
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .like-count {
+                font-size: 14px;
+            }
+
+            .no-projects {
+                padding: 60px 20px;
+                font-size: 16px;
+            }
+
+            .no-projects i {
+                font-size: 48px;
+                margin-bottom: 16px;
+            }
+
+            .footer {
+                padding: 30px 16px;
+                margin-top: 40px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-address, .footer-contact {
+                min-width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px 12px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .hamburger {
+                font-size: 22px;
+                padding: 8px;
+                min-width: 40px;
+                min-height: 40px;
+            }
+
+            .search-bar input {
+                padding: 10px 44px 10px 14px;
+                font-size: 13px;
+            }
+
+            .search-bar button {
+                padding: 6px 10px;
+                min-width: 36px;
+                min-height: 36px;
+            }
+
+            .side-menu {
+                width: 260px;
+                padding: 16px;
+            }
+
+            .side-menu .menu-logo {
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
+
+            .side-menu a {
+                font-size: 14px;
+                padding: 10px 14px;
+            }
+
+            .main-content {
+                padding: 0 12px;
+                margin: 70px auto 20px;
+            }
+
+            .notification-section {
+                padding: 12px;
+            }
+
+            .notification-section h3 {
+                font-size: 1.2rem;
+            }
+
+            .notification-card {
+                padding: 10px;
+            }
+
+            .notification-message {
+                font-size: 0.85rem;
+            }
+
+            .notification-status {
+                font-size: 0.8rem;
+            }
+
+            .category-title {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            .category-title::after {
+                width: 50px;
+                height: 2px;
+                bottom: -6px;
+            }
+
+            .project-grid {
+                gap: 16px;
+            }
+
+            .project-card {
+                border-radius: 14px;
+                min-height: 340px;
+            }
+
+            .project-image {
+                height: 140px;
+                padding: 10px;
+            }
+
+            .project-details {
+                padding: 16px;
+            }
+
+            .project-title {
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+
+            .project-type, .posted-by, .posted-date {
+                font-size: 12px;
+                margin-bottom: 6px;
+            }
+
+            .project-type i, .posted-by i, .posted-date i {
+                margin-right: 6px;
+                font-size: 13px;
+            }
+
+            .like-btn {
+                font-size: 18px;
+                padding: 6px;
+                min-width: 40px;
+                min-height: 40px;
+            }
+
+            .like-count {
+                font-size: 13px;
+            }
+
+            .no-projects {
+                padding: 50px 16px;
+                font-size: 15px;
+            }
+
+            .no-projects i {
+                font-size: 40px;
+            }
+
+            .footer {
+                padding: 24px 12px;
+            }
+
+            .footer-address h4, .footer-contact h4 {
+                font-size: 15px;
+            }
+
+            .footer-address p, .footer-contact p {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header {
+                padding: 8px 10px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .hamburger {
+                font-size: 20px;
+                padding: 6px;
+                min-width: 36px;
+                min-height: 36px;
+            }
+
+            .search-bar input {
+                padding: 8px 40px 8px 12px;
+                font-size: 12px;
+            }
+
+            .search-bar button {
+                padding: 5px 8px;
+                min-width: 32px;
+                min-height: 32px;
+            }
+
+            .side-menu {
+                width: 240px;
+                padding: 12px;
+            }
+
+            .side-menu .menu-logo {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+
+            .side-menu a {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .main-content {
+                padding: 0 10px;
+                margin: 60px auto 16px;
+            }
+
+            .notification-section {
+                padding: 10px;
+            }
+
+            .notification-section h3 {
+                font-size: 1.1rem;
+            }
+
+            .notification-card {
+                padding: 8px;
+            }
+
+            .notification-message {
+                font-size: 0.8rem;
+            }
+
+            .notification-status {
+                font-size: 0.75rem;
+            }
+
+            .category-title {
+                font-size: 22px;
+                margin-bottom: 16px;
+            }
+
+            .project-grid {
+                gap: 12px;
+            }
+
+            .project-card {
+                border-radius: 12px;
+                min-height: 320px;
+            }
+
+            .project-details {
+                padding: 14px;
+            }
+
+            .project-title {
+                font-size: 15px;
+                margin-bottom: 8px;
+            }
+
+            .project-type, .posted-by, .posted-date {
+                font-size: 11px;
+            }
+
+            .like-btn {
+                font-size: 16px;
+                min-width: 36px;
+                min-height: 36px;
+            }
+
+            .like-count {
+                font-size: 12px;
+            }
+
+            .footer {
+                padding: 20px 10px;
+            }
+
+            .footer-address h4, .footer-contact h4 {
+                font-size: 14px;
+            }
+
+            .footer-address p, .footer-contact p {
+                font-size: 11px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            ::-webkit-scrollbar {
+                width: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="hamburger" onclick="toggleSideMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">Projects Zone</div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search for projects..." onkeyup="handleSearch()">
+            <button onclick="performSearch()"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="auth-section">
+            {% if user.is_authenticated %}
+                <span class="notification-icon" onclick="window.location.href='/application-status/'">
+                    <i class="fas fa-bell"></i>
+                    {% if notifications|length > 0 %}
+                        <span class="notification-badge">{{ notifications|length }}</span>
+                    {% endif %}
+                </span>
+                <span class="user-icon" onclick="window.location.href='/userprofile/'"><i class="fas fa-user-circle"></i></span>
+                <button class="logout-btn" onclick="window.location.href='/logout/'">Logout</button>
+            {% else %}
+                <button class="login-btn" onclick="window.location.href='/login/'">Sign In</button>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="side-menu" id="sideMenu">
+        <div class="close-btn" onclick="toggleSideMenu()">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="menu-logo">SeniorSync Projects</div>
+        <ul>
+            <li><a href="#all" onclick="filterProjects('all'); toggleSideMenu();" class="nav-link active">All Projects</a></li>
+            <li><a href="#iot" onclick="filterProjects('iot'); toggleSideMenu();" class="nav-link">IoT Projects</a></li>
+            <li><a href="#computer" onclick="filterProjects('computer'); toggleSideMenu();" class="nav-link">Computer Projects</a></li>
+            <li><a href="#mechanical" onclick="filterProjects('mechanical'); toggleSideMenu();" class="nav-link">Mechanical Projects</a></li>
+            <li><a href="#teamrequests" onclick="filterProjects('teamrequests'); toggleSideMenu();" class="nav-link">Team Requests</a></li>
+        </ul>
+        <div class="auth-section">
+            {% if user.is_authenticated %}
+                <span class="notification-icon" onclick="window.location.href='/application-status/'; toggleSideMenu();">
+                    <i class="fas fa-bell"></i>
+                    {% if notifications|length > 0 %}
+                        <span class="notification-badge">{{ notifications|length }}</span>
+                    {% endif %}
+                </span>
+                <span class="user-icon" onclick="window.location.href='/userprofile/'; toggleSideMenu();"><i class="fas fa-user-circle"></i> Profile</span>
+                <button class="logout-btn" onclick="window.location.href='/logout/'; toggleSideMenu();">Logout</button>
+            {% else %}
+                <button class="login-btn" onclick="window.location.href='/login/'; toggleSideMenu();">Sign In</button>
+            {% endif %}
+        </div>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleSideMenu()"></div>
+
+    <nav class="nav-bar">
+        <ul>
+            <li><a href="#all" onclick="filterProjects('all')" class="nav-link active">All Projects</a></li>
+            <li><a href="#iot" onclick="filterProjects('iot')" class="nav-link">IoT Projects</a></li>
+            <li><a href="#computer" onclick="filterProjects('computer')" class="nav-link">Computer Projects</a></li>
+            <li><a href="#mechanical" onclick="filterProjects('mechanical')" class="nav-link">Mechanical Projects</a></li>
+            <li><a href="#teamrequests" onclick="filterProjects('teamrequests')" class="nav-link">Team Requests</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        {% if user.is_authenticated and notifications %}
+        <section class="notification-section">
+            <h3>Notifications</h3>
+            {% for notification in notifications %}
+            <div class="notification-card">
+                <span class="notification-message">
+                    Your application for <a href="/team-request/{{ notification.team_request.id }}/">{{ notification.team_request.project_name }}</a> has been {{ notification.status|lower }}.
+                </span>
+                <span class="notification-status {{ notification.status|lower }}">{{ notification.status }}</span>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+        <section id="uploaded-projects">
+            <h2 class="category-title" id="categoryTitle">All Projects</h2>
+            <div class="project-grid" id="projectGrid">
+                {% for item in items %}
+                <div class="project-card" data-type="{{ item.type }}" data-name="{{ item.name|lower }}" data-author="{{ item.user.profile.name|lower }}">
+                    {% if item.image_urls %}
+                        <img src="{{ item.image_urls.0 }}" alt="{{ item.name }}" class="project-image" onerror="this.src='https://via.placeholder.com/320x200/dbeafe/3b82f6?text=Image+Not+Found';">
+                    {% elif item.type == 'teamrequests' %}
+                        <img src="https://res.cloudinary.com/dxs85zu0x/image/upload/v1750584169/project_uploads/ChatGPT%20Image%20Jun%2022%2C%202025%2C%2002_50_34%20PM.png.png" alt="{{ item.name }}" class="project-image">
+                    {% else %}
+                        <div class="project-image" style="background: linear-gradient(135deg, #dbeafe, #f1f5f9); display:flex; align-items:center; justify-content:center; font-weight:600; color:#64748b; font-size:16px; text-align:center;">
+                            <i class="fas fa-image" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
+                            No Image Available
+                        </div>
+                    {% endif %}
+                    <div class="project-details">
+                        <a href="{% if item.is_project %}/project/{{ item.id }}/{% else %}/team-request/{{ item.id }}/{% endif %}" 
+                           {% if not item.is_project and not user.is_authenticated %}onclick="alert('Please sign in to view team request details.'); window.location.href='/login/'; return false;"{% endif %}
+                           class="project-title">{{ item.name }}</a>
+                        <p class="project-type"><i class="fas fa-tag"></i>
+                            {% if item.type == 'teamrequests' %}Team Request{% else %}{{ item.type|capfirst }}{% endif %}
+                        </p>
+                        <p class="posted-by"><i class="fas fa-user"></i>{{ item.user.profile.name }}</p>
+                        <p class="posted-date"><i class="fas fa-calendar-alt"></i>{{ item.created_at|date:"F d, Y" }}</p>
+                        <div class="like-section">
+                            {% if item.is_project %}
+                            <button class="like-btn" 
+                                    onclick="toggleLike({{ item.id }}, this, '{{ user.is_authenticated|yesno:"true,false" }}')" 
+                                    style="{% if user.is_authenticated and item.id in liked_projects %}color: #dc2626;{% endif %}">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                            <span class="like-count">{{ item.like_count }} Likes</span>
+                            <button class="like-btn share-btn" 
+                                    onclick="shareItem('{{ item.name|escapejs }}', {% if item.is_project %}'project'{% else %}'team-request'{% endif %}, {{ item.id }})"
+                                    title="Share this {% if item.is_project %}project{% else %}team request{% endif %}">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <span class="share-feedback" id="share-feedback-{{ item.id }}" style="display: none; font-size: 14px; color: var(--success);">Link copied!</span>
+                            {% else %}
+                            <button class="like-btn" disabled style="color: var(--text-light); cursor: not-allowed;" title="Likes not available for team requests">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                            <span class="like-count">N/A</span>
+                            <button class="like-btn share-btn" 
+                                    onclick="shareItem('{{ item.name|escapejs }}', 'team-request', {{ item.id }})"
+                                    title="Share this team request">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <span class="share-feedback" id="share-feedback-{{ item.id }}" style="display: none; font-size: 14px; color: var(--success);">Link copied!</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-projects">
+                    <i class="fas fa-folder-open"></i>
+                    <p>No projects or team requests available.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-contact">
+            <h4>Contact Us</h4>
+            <p>Email: <a href="mailto:karthik07605@gmail.com">karthik07605@gmail.com</a></p>
+            <p>Phone: <a href="tel:+91-9849499433">+91 9849499433</a></p>
+            <p>Support Hours: Mon-Fri, 9 AM - 5 PM</p>
+        </div>
+    </footer>
+
+    <script>
+        let allItems = [];
+        let currentFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const projectCards = document.querySelectorAll('.project-card');
+            allItems = Array.from(projectCards).map(card => ({
+                element: card,
+                type: card.dataset.type,
+                name: card.dataset.name,
+                author: card.dataset.author
+            }));
+        });
+
+        function toggleSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('overlay');
+            sideMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : '';
+        }
+
+        function filterProjects(type) {
+            currentFilter = type;
+            const projectGrid = document.getElementById('projectGrid');
+            const categoryTitle = document.getElementById('categoryTitle');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => link.classList.remove('active'));
+            const activeLinks = document.querySelectorAll(`.nav-link[href="#${type}"]`);
+            activeLinks.forEach(link => link.classList.add('active'));
+            
+            const titles = {
+                'all': 'All Projects',
+                'iot': 'IoT Projects',
+                'computer': 'Computer Projects',
+                'mechanical': 'Mechanical Projects',
+                'teamrequests': 'Team Requests'
+            };
+            categoryTitle.textContent = titles[type] || 'All Projects';
+            
+            const filteredItems = type === 'all' 
+                ? allItems 
+                : allItems.filter(item => item.type === type);
+            
+            displayProjects(filteredItems);
+        }
+
+        function displayProjects(items) {
+            const projectGrid = document.getElementById('projectGrid');
+            
+            if (items.length === 0) {
+                projectGrid.innerHTML = `
+                    <div class="no-projects">
+                        <i class="fas fa-search"></i>
+                        <p>No projects or team requests found.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            projectGrid.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const clonedElement = item.element.cloneNode(true);
+                clonedElement.style.animationDelay = `${index * 0.1}s`;
+                projectGrid.appendChild(clonedElement);
+            });
+        }
+
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filterProjects(currentFilter);
+                return;
+            }
+            
+            performSearchWithTerm(searchTerm);
+        }
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                alert('Please enter a search term');
+                return;
+            }
+            
+            performSearchWithTerm(searchTerm);
+        }
+
+        function performSearchWithTerm(searchTerm) {
+            const categoryTitle = document.getElementById('categoryTitle');
+            
+            let baseItems = currentFilter === 'all' 
+                ? allItems 
+                : allItems.filter(item => item.type === currentFilter);
+            
+            const searchResults = baseItems.filter(item => 
+                item.name.includes(searchTerm) || 
+                item.author.includes(searchTerm) ||
+                item.type.includes(searchTerm)
+            );
+            
+            categoryTitle.textContent = `Search Results for "${searchTerm}"`;
+            
+            displayProjects(searchResults);
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        function toggleLike(projectId, button, isAuthenticated) {
+            if (isAuthenticated === 'false') {
+                alert('Please sign in to like a project.');
+                window.location.href = '/login/';
+                return;
+            }
+
+            const likeCountSpan = button.nextElementSibling;
+            fetch('/toggle_like/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({ project_id: projectId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'Success') {
+                    likeCountSpan.textContent = `${data.like_count} Likes`;
+                    if (data.action === 'liked') {
+                        button.style.color = '#dc2626';
+                        button.classList.add('clicked');
+                        setTimeout(() => button.classList.remove('clicked'), 600);
+                    } else {
+                        button.style.color = '';
+                    }
+                } else {
+                    alert(data.message || 'An error occurred while processing your request.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your request.');
+            });
+        }
+
+        function shareItem(name, type, id) {
+            const baseUrl = window.location.origin;
+            const url = type === 'project' ? `${baseUrl}/project/${id}/` : `${baseUrl}/team-request/${id}/`;
+            const title = `Check out this ${type === 'project' ? 'project' : 'team request'}: ${name}`;
+            const text = `Explore "${name}" on SeniorSync Projects!`;
+            
+            if (navigator.share && navigator.canShare({ url })) {
+                navigator.share({
+                    title: title,
+                    text: text,
+                    url: url
+                }).catch(error => {
+                    console.error('Error sharing:', error);
+                    fallbackCopyToClipboard(url, id);
+                });
+            } else {
+                fallbackCopyToClipboard(url, id);
+            }
+        }
+
+        function fallbackCopyToClipboard(url, id) {
+            const textArea = document.createElement('textarea');
+            textArea.value = url;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showShareFeedback(id);
+            } catch (error) {
+                console.error('Error copying to clipboard:', error);
+                alert('Failed to copy link. Please copy it manually: ' + url);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showShareFeedback(id) {
+            const feedback = document.getElementById(`share-feedback-${id}`);
+            if (feedback) {
+                feedback.style.display = 'inline';
+                setTimeout(() => {
+                    feedback.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

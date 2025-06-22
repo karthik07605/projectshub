@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --bark-blue-50: #f0f4f8;
+            --bark-blue-100: #d9e6f2;
+            --bark-blue-200: #b3cce6;
+            --bark-blue-300: #8db3d9;
+            --bark-blue-400: #6699cc;
+            --bark-blue-500: #4080bf;
+            --bark-blue-600: #335c8a;
+            --bark-blue-700: #264555;
+            --bark-blue-800: #1a2e3f;
+            --bark-blue-900: #0d1720;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bark-blue-50) 0%, var(--white) 100%);
+            color: var(--bark-blue-800);
+            min-height: 100vh;
+            line-height: 1.6;
+            animation: pageLoad 1s ease-out;
+        }
+
+        @keyframes pageLoad {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--bark-blue-600), var(--bark-blue-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--gray-500);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .profile-card {
+            background: linear-gradient(135deg, var(--white) 0%, var(--bark-blue-50) 100%);
+            border: 1px solid var(--bark-blue-200);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(64, 128, 191, 0.1);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 20px;
+            animation: slideRight 0.8s ease-out 0.4s both;
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--bark-blue-400), var(--bark-blue-500), var(--bark-blue-600));
+            border-radius: 20px 20px 0 0;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--bark-blue-400), var(--bark-blue-600));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--white);
+            margin: 0 auto 24px;
+            animation: bounce 2s infinite;
+            box-shadow: 0 8px 25px rgba(64, 128, 191, 0.3);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .profile-card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .profile-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--bark-blue-100);
+            transition: all 0.3s ease;
+        }
+
+        .profile-detail:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(64, 128, 191, 0.15);
+        }
+
+        .profile-detail-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            color: var(--bark-blue-500);
+        }
+
+        .profile-detail-label {
+            font-weight: 500;
+            color: var(--gray-600);
+            min-width: 60px;
+        }
+
+        .profile-detail-value {
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            margin-left: auto;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .options-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .options-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--bark-blue-400), var(--bark-blue-600));
+            border-radius: 2px;
+            margin-right: 12px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .option-card {
+            background: var(--white);
+            border: 1px solid var(--bark-blue-100);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(64, 128, 191, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .option-card:nth-child(1) { animation-delay: 0.8s; }
+        .option-card:nth-child(2) { animation-delay: 0.9s; }
+        .option-card:nth-child(3) { animation-delay: 1.0s; }
+        .option-card:nth-child(4) { animation-delay: 1.1s; }
+        .option-card:nth-child(5) { animation-delay: 1.2s; }
+        .option-card:nth-child(6) { animation-delay: 1.3s; }
+        .option-card:nth-child(7) { animation-delay: 1.4s; }
+        .option-card:nth-child(8) { animation-delay: 1.5s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(64, 128, 191, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .option-card:hover::before {
+            left: 100%;
+        }
+
+        .option-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(64, 128, 191, 0.2);
+            border-color: var(--bark-blue-300);
+        }
+
+        .option-card:active {
+            transform: translateY(-4px) scale(0.98);
+        }
+
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--bark-blue-100), var(--bark-blue-200));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover .option-icon {
+            background: linear-gradient(135deg, var(--bark-blue-400), var(--bark-blue-500));
+            transform: rotate(5deg) scale(1.1);
+            box-shadow: 0 8px 20px rgba(64, 128, 191, 0.3);
+        }
+
+        .option-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .option-card:hover h3 {
+            color: var(--bark-blue-600);
+        }
+
+        .option-card p {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .option-card:hover p {
+            color: var(--gray-600);
+        }
+
+        .option-card.danger:hover {
+            border-color: var(--error);
+            box-shadow: 0 15px 40px rgba(239, 68, 68, 0.2);
+        }
+
+        .option-card.danger:hover .option-icon {
+            background: linear-gradient(135deg, var(--error), #dc2626);
+        }
+
+        .option-card.danger:hover h3 {
+            color: var(--error);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .profile-card {
+                position: relative;
+                top: 0;
+            }
+
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header {
+                margin-bottom: 24px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 4px;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .main-content {
+                gap: 20px;
+            }
+
+            .profile-card {
+                padding: 20px;
+                border-radius: 16px;
+                background: linear-gradient(135deg, var(--white) 0%, var(--bark-blue-50) 100%);
+            }
+
+            .profile-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+                margin: 0 0 16px 0;
+                float: left;
+            }
+
+            .account-options {
+                background: linear-gradient(135deg, var(--white) 0%, var(--bark-blue-50) 100%);
+                border: 1px solid var(--bark-blue-200);
+                border-radius: 20px;
+                padding: 32px;
+                box-shadow: 0 10px 40px rgba(64, 128, 191, 0.1);
+                backdrop-filter: blur(10px);
+                animation: slideLeft 0.8s ease-out 0.6s both;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .account-options::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--bark-blue-400), var(--bark-blue-500), var(--bark-blue-600));
+                border-radius: 20px 20px 0 0;
+            }
+
+            .profile-card h2 {
+                font-size: 1.2rem;
+                text-align: left;
+                margin: 0 0 16px 70px;
+                padding-top: 8px;
+            }
+
+            .profile-detail {
+                margin-bottom: 12px;
+                padding: 8px 12px;
+                border-radius: 8px;
+                clear: both;
+            }
+
+            .profile-detail-icon {
+                width: 16px;
+                height: 16px;
+                margin-right: 8px;
+            }
+
+            .profile-detail-label {
+                font-size: 0.85rem;
+                min-width: 50px;
+            }
+
+            .profile-detail-value {
+                font-size: 0.85rem;
+            }
+
+            .options-title {
+                font-size: 1.2rem;
+                margin-bottom: 16px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .option-card {
+                padding: 16px 12px;
+                text-align: center;
+                border-radius: 12px;
+                min-height: 120px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .option-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+                margin: 0 auto 8px;
+                border-radius: 8px;
+            }
+
+            .option-card h3 {
+                font-size: 0.85rem;
+                margin-bottom: 4px;
+                line-height: 1.2;
+                text-align: center;
+            }
+
+            .option-card p {
+                font-size: 0.7rem;
+                line-height: 1.3;
+                text-align: center;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .option-card:hover {
+                transform: translateY(-4px) scale(1.02);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .profile-card {
+                padding: 16px;
+            }
+
+            .profile-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+
+            .profile-card h2 {
+                font-size: 1.1rem;
+                margin-left: 60px;
+            }
+
+            .options-grid {
+                gap: 10px;
+            }
+
+            .option-card {
+                padding: 12px 8px;
+                min-height: 110px;
+            }
+
+            .option-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+                margin-bottom: 6px;
+            }
+
+            .option-card h3 {
+                font-size: 0.8rem;
+                margin-bottom: 3px;
+            }
+
+            .option-card p {
+                font-size: 0.65rem;
+                -webkit-line-clamp: 2;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .options-grid {
+                gap: 8px;
+            }
+
+            .option-card {
+                padding: 10px 6px;
+                min-height: 100px;
+            }
+
+            .option-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+
+            .option-card h3 {
+                font-size: 0.75rem;
+            }
+
+            .option-card p {
+                font-size: 0.6rem;
+            }
+        }
+
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out 2s both;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Projects Zone</h1>
+            <p>Manage your account and projects</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <div class="profile-avatar">👤</div>
+                <h2>Your Profile</h2>
+                
+                <div class="profile-detail">
+                    <div class="profile-detail-icon">👤</div>
+                    <span class="profile-detail-label">Name:</span>
+                    <span class="profile-detail-value">{{ profile.name }}</span>
+                </div>
+                
+                <div class="profile-detail">
+                    <div class="profile-detail-icon">📱</div>
+                    <span class="profile-detail-label">Mobile:</span>
+                    <span class="profile-detail-value">{{ profile.mobile }}</span>
+                </div>
+                
+                <div class="profile-detail">
+                    <div class="profile-detail-icon">✉️</div>
+                    <span class="profile-detail-label">Email:</span>
+                    <span class="profile-detail-value">{{ user.email }}</span>
+                </div>
+            </div>
+
+            <!-- Account Options -->
+            <div class="account-options">
+                <div class="options-title">Account Options</div>
+                
+                <div class="options-grid">
+                    <div class="option-card" onclick="navigateTo('/login-security/')">
+                        <div class="option-icon">🔒</div>
+                        <h3>Login & Security</h3>
+                        <p>Edit login, name, and mobile number</p>
+                    </div>
+                    
+                    <div class="option-card" onclick="navigateTo('/upload-project/')">
+                        <div class="option-icon">📤</div>
+                        <h3>Upload Project</h3>
+                        <p>Upload your final year projects to share and sell</p>
+                    </div>
+                    
+                    <div class="option-card" onclick="navigateTo('/uploaded-projects/')">
+                        <div class="option-icon">📋</div>
+                        <h3>Uploaded Projects</h3>
+                        <p>View and manage your uploaded projects</p>
+                    </div>
+
+                    <div class="option-card" onclick="navigateTo('/application-status/')">
+    <div class="option-icon">📄</div>
+    <h3>Check Application Status</h3>
+    <p>View the current status of your applications</p>
+</div>
+                    
+                    <div class="option-card" onclick="navigateTo('/team-requests/')">
+                        <div class="option-icon">🤝</div>
+                        <h3>Team Requests</h3>
+                        <p>View and manage your team member requests</p>
+                    </div>
+                    
+                    <div class="option-card" onclick="navigateTo('/change-password/')">
+                        <div class="option-icon">🔑</div>
+                        <h3>Change Password</h3>
+                        <p>Update your account password</p>
+                    </div>
+                    
+                    <div class="option-card danger" onclick="if(confirm('Are you sure you want to delete your account? This action cannot be undone.')) { navigateTo('/delete-account/'); }">
+                        <div class="option-icon">🗑️</div>
+                        <h3>Delete Account</h3>
+                        <p>Permanently delete your account and data</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (const cookie of cookies) {
+                    const trimmedCookie = cookie.trim();
+                    if (trimmedCookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(trimmedCookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const optionCards = document.querySelectorAll('.option-card');
+            
+            optionCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

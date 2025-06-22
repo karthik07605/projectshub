@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-color: #4a73c0; /* Soft pastel blue */
+            --secondary-color: #7ea3f0; /* Lighter pastel blue */
+            --accent-color: #b3c9f8; /* Very light blue */
+            --light-gray: #f0f2f5; /* Light gray for borders */
+            --lighter-gray: #f8f9fb; /* Almost white */
+            --text-primary: #1f2a3c; /* Soft dark gray */
+            --text-secondary: #6b7280; /* Light gray text */
+            --text-light: #9ca3af; /* Lighter gray text */
+            --bg-primary: #ffffff; /* White main background */
+            --bg-secondary: #ffffff; /* White for cards */
+            --bg-card: #ffffff;
+            --border-color: #e5e7eb; /* Very light gray */
+            --border-light: #f3f4f6; /* Almost white border */
+            --shadow-xs: rgba(74, 115, 192, 0.08); /* Soft blue shadow */
+            --shadow-sm: rgba(74, 115, 192, 0.12);
+            --shadow-md: rgba(74, 115, 192, 0.18);
+            --shadow-lg: rgba(74, 115, 192, 0.25);
+            --shadow-xl: rgba(74, 115, 192, 0.35);
+            --gradient-primary: linear-gradient(135deg, #4a73c0 0%, #7ea3f0 100%); /* Soft blue gradient */
+            --gradient-light: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%); /* White to light gray */
+            --gradient-card: linear-gradient(135deg, #ffffff 0%, #f8f9fb 100%);
+        }
+
+        body {
+            background: var(--gradient-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-weight: 400;
+            min-height: 100vh;
+            animation: pageLoad 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes pageLoad {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 24px;
+            background: var(--gradient-card);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px var(--shadow-xs);
+            border: 1px solid var(--border-light);
+            animation: cardFloat 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes cardFloat {
+            from { 
+                opacity: 0; 
+                transform: translateY(60px) rotateX(10deg); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) rotateX(0deg); 
+            }
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            position: relative;
+            display: inline-block;
+            letter-spacing: -0.8px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 5px;
+            background: var(--gradient-primary);
+            bottom: -12px;
+            left: 0;
+            border-radius: 3px;
+            animation: underlineGrow 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+        }
+
+        @keyframes underlineGrow {
+            from { 
+                width: 0; 
+                opacity: 0; 
+            }
+            to { 
+                width: 100px; 
+                opacity: 1; 
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+            padding-left: 4px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            background: var(--bg-secondary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px var(--shadow-xs);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 8px 32px var(--shadow-sm), 0 0 0 4px rgba(74, 115, 192, 0.1);
+            transform: translateY(-2px);
+            background: var(--bg-secondary);
+        }
+
+        input::placeholder, textarea::placeholder, select:invalid {
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 16px var(--shadow-sm);
+            margin-right: 12px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px var(--shadow-md);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+            background: var(--primary-color);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--gradient-primary);
+        }
+
+        .back-btn, .cancel-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 4px 16px var(--shadow-xs);
+        }
+
+        .back-btn:hover:not(:disabled), .cancel-btn:hover:not(:disabled) {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px var(--shadow-md);
+        }
+
+        .back-btn:active:not(:disabled), .cancel-btn:active:not(:disabled) {
+            transform: translateY(0);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .message {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #DC3545;
+            display: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .message.success {
+            color: #28A745;
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .preview-image, .preview-video {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px var(--shadow-xs);
+        }
+
+        .preview-video {
+            object-fit: fill;
+        }
+
+        .preview-image:hover, .preview-video:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 24px var(--shadow-sm);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            position: relative;
+        }
+
+        .modal h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .modal img, .modal video {
+            max-width: 100%;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 16px var(--shadow-xs);
+        }
+
+        .modal video source {
+            max-width: 100%;
+        }
+
+        .close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 24px;
+            color: #DC3545;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            transform: rotate(90deg);
+            color: var(--secondary-color);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            h1::after {
+                width: 60px;
+                height: 3px;
+                bottom: -8px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            label {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            input, textarea, select {
+                padding: 12px 14px;
+                font-size: 13px;
+                border-radius: 10px;
+            }
+
+            textarea {
+                height: 100px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 13px;
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .preview-container {
+                gap: 12px;
+            }
+
+            .preview-image, .preview-video {
+                width: 80px;
+                height: 80px;
+                border-radius: 10px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                border-radius: 12px;
+                max-width: 90%;
+            }
+
+            .modal h2 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .modal p {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+
+            .modal img, .modal video {
+                border-radius: 10px;
+            }
+
+            .close {
+                font-size: 22px;
+                top: 10px;
+                right: 10px;
+            }
+
+            .loading::after {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 16px auto;
+                padding: 16px;
+                border-radius: 14px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin-bottom: 16px;
+            }
+
+            h1::after {
+                width: 50px;
+                height: 2px;
+                bottom: -6px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            label {
+                font-size: 13px;
+                margin-bottom: 4px;
+            }
+
+            input, textarea, select {
+                padding: 10px 12px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+
+            textarea {
+                height: 80px;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 12px;
+                min-width: 40px;
+                min-height: 40px;
+            }
+
+            .preview-container {
+                gap: 10px;
+            }
+
+            .preview-image, .preview-video {
+                width: 70px;
+                height: 70px;
+                border-radius: 8px;
+            }
+
+            .modal-content {
+                padding: 16px;
+                border-radius: 10px;
+            }
+
+            .modal h2 {
+                font-size: 16px;
+                margin-bottom: 8px;
+            }
+
+            .modal p {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+
+            .modal img, .modal video {
+                border-radius: 8px;
+            }
+
+            .close {
+                font-size: 20px;
+                top: 8px;
+                right: 8px;
+            }
+
+            .loading::after {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                margin: 12px auto;
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 12px;
+            }
+
+            h1::after {
+                width: 40px;
+                height: 2px;
+                bottom: -4px;
+            }
+
+            .form-group {
+                margin-bottom: 10px;
+            }
+
+            label {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            input, textarea, select {
+                padding: 8px 10px;
+                font-size: 11px;
+                border-radius: 6px;
+            }
+
+            textarea {
+                height: 70px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 11px;
+                min-width: 36px;
+                min-height: 36px;
+            }
+
+            .preview-container {
+                gap: 8px;
+            }
+
+            .preview-image, .preview-video {
+                width: 60px;
+                height: 60px;
+                border-radius: 6px;
+            }
+
+            .modal-content {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .modal h2 {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            .modal p {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+
+            .modal img, .modal video {
+                border-radius: 6px;
+            }
+
+            .close {
+                font-size: 18px;
+                top: 6px;
+                right: 6px;
+            }
+
+            .loading::after {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            ::-webkit-scrollbar {
+                width: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Project</h1>
+        <form id="uploadProjectForm" method="POST" action="/upload-project/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="project-name">Project Name</label>
+                <input type="text" id="project-name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="project-type">Project Type</label>
+                <select id="project-type" name="type" required>
+                    <option value="" disabled selected>Select a project type</option>
+                    <option value="IoT">IoT Project</option>
+                    <option value="Computer">Computer Project</option>
+                    <option value="Mechanical">Mechanical Project</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="project-description">Description</label>
+                <textarea id="project-description" name="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="github-link">GitHub Link (Optional)</label>
+                <input type="url" id="github-link" name="github_link" placeholder="https://github.com/username/repository">
+            </div>
+            <div class="form-group">
+                <label for="project-images">Images (Optional)</label>
+                <input type="file" id="project-images" name="images" multiple accept="image/*">
+            </div>
+            <div class="form-group">
+                <label for="project-videos">Videos (Optional, max 10MB each)</label>
+                <input type="file" id="project-videos" name="videos" multiple accept="video/*">
+            </div>
+            <button type="submit" id="upload-btn">Upload Project</button>
+            <button type="button" class="back-btn" onclick="window.history.back()">Back</button>
+            <button type="button" class="cancel-btn" onclick="window.history.back()">Cancel</button>
+            <div id="upload-message" class="message"></div>
+        </form>
+        <div id="preview-container" class="preview-container"></div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2 id="modal-title"></h2>
+            <p id="modal-description"></p>
+            <div id="modal-images"></div>
+            <div id="modal-videos"></div>
+        </div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (const cookie of cookies) {
+                    const trimmedCookie = cookie.trim();
+                    if (trimmedCookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(trimmedCookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        // Validate video size before submission
+        document.getElementById('project-videos').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            for (const file of files) {
+                if (file.size > maxSize) {
+                    alert(`Video "${file.name}" exceeds 10MB. Please upload a smaller file.`);
+                    e.target.value = ''; // Clear the input
+                    return;
+                }
+            }
+        });
+
+        document.getElementById('uploadProjectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const previewContainer = document.getElementById('preview-container');
+            const githubLink = formData.get('github_link');
+            const uploadBtn = document.getElementById('upload-btn');
+            const backBtn = document.querySelector('.back-btn');
+            const cancelBtn = document.querySelector('.cancel-btn');
+            const message = document.getElementById('upload-message');
+
+            // Validate GitHub link if provided
+            if (githubLink && !githubLink.match(/^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+$/)) {
+                message.classList.add('error');
+                message.textContent = 'Invalid GitHub link format. Use https://github.com/username/repository';
+                message.style.display = 'block';
+                setTimeout(() => message.style.display = 'none', 3000);
+                return;
+            }
+
+            // Show loading state
+            uploadBtn.disabled = true;
+            backBtn.disabled = true;
+            cancelBtn.disabled = true;
+            uploadBtn.classList.add('loading');
+            uploadBtn.textContent = 'Uploading...';
+
+            fetch('/upload-project/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reset button state
+                uploadBtn.disabled = false;
+                backBtn.disabled = false;
+                cancelBtn.disabled = false;
+                uploadBtn.classList.remove('loading');
+                uploadBtn.textContent = 'Upload Project';
+
+                if (data.status === 'Success') {
+                    message.classList.add('success');
+                    message.textContent = 'Uploaded successfully';
+                    this.reset();
+                    previewContainer.innerHTML = '';
+                    message.style.display = 'block';
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                        window.history.back();
+                    }, 2000);
+                } else {
+                    message.classList.remove('success');
+                    message.textContent = data.message || 'Error uploading project.';
+                    message.style.display = 'block';
+                    setTimeout(() => message.style.display = 'none', 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Reset button state on error
+                uploadBtn.disabled = false;
+                backBtn.disabled = false;
+                cancelBtn.disabled = false;
+                uploadBtn.classList.remove('loading');
+                uploadBtn.textContent = 'Upload Project';
+
+                message.classList.remove('success');
+                message.textContent = 'An error occurred.';
+                message.style.display = 'block';
+                setTimeout(() => message.style.display = 'none', 3000);
+            });
+        });
+
+        function showModal(projectId, name, description, images, videos) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalImages = document.getElementById('modal-images');
+            const modalVideos = document.getElementById('modal-videos');
+
+            modalTitle.textContent = name || 'Untitled Project';
+            modalDescription.textContent = description || 'No description provided';
+            modalImages.innerHTML = '';
+            modalVideos.innerHTML = '';
+
+            images.forEach((img, index) => {
+                const imgUrl = URL.createObjectURL(img);
+                const image = document.createElement('img');
+                image.src = imgUrl;
+                image.style.maxWidth = '100%';
+                modalImages.appendChild(image);
+            });
+
+            videos.forEach((vid, index) => {
+                const vidUrl = URL.createObjectURL(vid);
+                const video = document.createElement('video');
+                video.controls = true;
+                const source = document.createElement('source');
+                source.src = vidUrl;
+                source.type = 'video/mp4';
+                video.appendChild(source);
+                modalVideos.appendChild(video);
+            });
+
+            modal.style.display = 'flex';
+
+            document.querySelector('.close').onclick = () => {
+                modal.style.display = 'none';
+                document.querySelectorAll('#modal-videos video').forEach(v => v.pause());
+            };
+
+            window.onclick = (event) => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    document.querySelectorAll('#modal-videos video').forEach(v => v.pause());
+                }
+            };
+        }
+    </script>
+</body>
+</html>
