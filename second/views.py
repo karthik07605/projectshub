@@ -585,11 +585,16 @@ def password_reset_confirm(request, uidb64, token):
         user = None
     if user is not None and default_token_generator.check_token(user, token):
         if request.method == 'POST':
-            password = request.POST.get('password')
-            if not password:
-                return JsonResponse({'status': 'Failed', 'message': 'Password is required'}, status=400)
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+            if not new_password1 or not new_password2:
+                logger.warning(f"Password reset attempt for {user.email} with missing password fields")
+                return JsonResponse({'status': 'Failed', 'message': 'Both password fields are required'}, status=400)
+            if new_password1 != new_password2:
+                logger.warning(f"Password reset attempt for {user.email} with mismatched passwords")
+                return JsonResponse({'status': 'Failed', 'message': 'Passwords do not match'}, status=400)
             try:
-                user.set_password(password)
+                user.set_password(new_password1)
                 user.save()
                 logger.info(f"Password reset successful for user {user.email}")
                 return JsonResponse({'status': 'Success', 'message': 'Password reset successfully', 'redirect': '/login/'})
