@@ -548,18 +548,21 @@ def reset_password(request):
             logger.warning(f"Password reset attempt for unregistered email {email_lower}")
             return JsonResponse({'status': 'Failed', 'message': 'Email not found'}, status=400)
         try:
-            logger.debug(f"DEFAULT_FROM_EMAIL: {settings.DEFAULT_FROM_EMAIL}")  # Debug email config
+            logger.debug(f"DEFAULT_FROM_EMAIL: {settings.DEFAULT_FROM_EMAIL}")
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            reset_link = f"{request.scheme}://{request.get_host()}/reset_password_confirm/{uid}/{token}/"
-            logger.debug(f"Password reset link: {reset_link}")  # Debug reset link
+            # Conditionally set scheme based on environment
+            host = request.get_host()
+            scheme = 'http' if host.startswith(('127.0.0.1', 'localhost')) else 'https'
+            reset_link = f"{scheme}://{host}/reset_password_confirm/{uid}/{token}/"
+            logger.debug(f"Password reset link: {reset_link}")
             subject = 'Password Reset Request'
             message = render_to_string('password_reset_email.html', {
                 'user': user,
                 'reset_link': reset_link,
-                'sent_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S %Z'),  # Add sent_time
+                'sent_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S %Z'),
             })
-            logger.debug(f"Rendered email content: {message}")  # Debug email content
+            logger.debug(f"Rendered email content: {message}")
             email_message = EmailMessage(
                 subject=subject,
                 body=message,
