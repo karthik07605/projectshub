@@ -9,6 +9,8 @@ SECRET_KEY = 'django-insecure-((oq0ob-b7*(05)tvj+tada1-6pi1z6vv_z85z9*z#!q=fw)yj
 DEBUG = True
 ALLOWED_HOSTS = ['*','projectszone.pythonanywhere.com','projects-zone.onrender.com']
 
+SECURE_SSL_REDIRECT = True
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
