@@ -95,8 +95,8 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = 'No Reply <noreply@example.com>'
-SITE_URL = 'http://127.0.0.1:8000'
+DEFAULT_FROM_EMAIL = 'noreply@projects-zone.com'
+SITE_URL = 'https://projects-zone.onrender.com/'
 
 # Cloudinary Configuration
 cloudinary.config(
