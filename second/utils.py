@@ -41,11 +41,10 @@ def send_otp_email(data, otp):
             </body>
         </html>
         """
-        from_email = settings.DEFAULT_FROM_EMAIL
         email_msg = EmailMessage(
             subject,
             body,
-            from_email,
+            formataddr(("Projects Zone", settings.EMAIL_HOST_USER)),  # Friendly sender name
             [email]
         )
         email_msg.content_subtype = 'html'
