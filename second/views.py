@@ -566,7 +566,7 @@ def reset_password(request):
             email_message = EmailMessage(
                 subject=subject,
                 body=message,
-                from_email=formataddr(('Projects Zone', settings.DEFAULT_FROM_EMAIL)),
+                from_email=formataddr(('Projects Zone', settings.EMAIL_HOST_USER)),  # Use EMAIL_HOST_USER
                 to=[email_lower]
             )
             email_message.content_subtype = 'html'
