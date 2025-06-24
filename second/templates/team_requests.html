@@ -663,6 +663,10 @@
                 padding: 2px 6px;
             }
 
+            .application-message {
+                font-size: 0.75rem;
+            }
+
             .application-btn {
                 padding: 5px;
                 font-size: 0.75rem;
@@ -734,6 +738,16 @@
                                                 {% if application.message %}
                                                     <div class="application-message">
                                                         <strong>Message:</strong> {{ application.message|truncatewords:15 }}
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.github_url %}
+                                                    <div style="margin-top: 8px;">
+                                                        <strong>GitHub Profile:</strong> <a href="{{ application.github_url }}" target="_blank" style="color: var(--bark-blue-500); text-decoration: none;">{{ application.github_url }}</a>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.what_you_can_do %}
+                                                    <div style="margin-top: 8px;">
+                                                        <strong>What You Can Do:</strong> {{ application.what_you_can_do|truncatewords:15 }}
                                                     </div>
                                                 {% endif %}
                                                 <!-- Applicant's Projects -->

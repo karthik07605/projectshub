@@ -27,9 +27,10 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    image_urls = models.TextField(blank=True, null=True)
+    image_urls = models.TextField()  # Mandatory, removed blank=True, null=True
     video_urls = models.TextField(blank=True, null=True)
     github_link = models.URLField(blank=True, null=True)
+    hosted_link = models.URLField(blank=True, null=True)  # New optional field
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -39,6 +40,8 @@ class Project(models.Model):
         if self.video_urls:
             cleaned_urls = [url.strip() for url in self.video_urls.split(',') if url.strip() and url.startswith('https://')]
             self.video_urls = ','.join(cleaned_urls)
+        if self.hosted_link and not self.hosted_link.startswith('https://'):
+            self.hosted_link = 'https://' + self.hosted_link
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -92,6 +95,8 @@ class TeamMemberApplication(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team_request = models.ForeignKey(TeamMemberRequest, on_delete=models.CASCADE, related_name='applications')
     message = models.TextField(blank=True, null=True)
+    what_you_can_do = models.TextField(blank=True, null=True)
+    github_url = models.URLField(max_length=200, blank=False)
     applied_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
 

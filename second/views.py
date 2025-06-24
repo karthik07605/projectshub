@@ -1,7 +1,6 @@
 from django.core.mail import EmailMessage
 from django.conf import settings
 from email.utils import formataddr
-from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,15 +11,15 @@ from .utils import send_otp_email
 from django.middleware.csrf import get_token
 from .cloudinary_utils import upload_to_cloudinary
 import logging
-import re
+import re,os
 import cloudinary
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
-from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Q
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -213,57 +212,56 @@ def edit_team_request(request, request_id):
 @login_required
 def delete_team_request(request):
     if request.method == 'POST':
-        try:
-            import json
-            data = json.loads(request.body)
-            request_id = data.get('request_id')
-            if not request_id:
-                return JsonResponse({'status': 'Failed', 'message': 'Request ID is required'}, status=400)
-            team_request = get_object_or_404(TeamMemberRequest, id=request_id)
-            if team_request.user != request.user:
-                logger.warning(f"User {request.user.username} attempted to delete team request {request_id} they do not own")
-                return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to delete this request'}, status=403)
-            project_name = team_request.project_name
-            team_request.delete()
-            logger.info(f"Team request '{project_name}' deleted by user {request.user.username}")
-            return JsonResponse({'status': 'Success', 'message': 'Team member request deleted successfully'})
-        except Exception as e:
-            logger.error(f"Error deleting team request for user {request.user.username}: {str(e)}")
-            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'}, status=500)
+        data = json.loads(request.body)
+        request_id = data.get('request_id')
+        if not request_id:
+            return JsonResponse({'status': 'Failed', 'message': 'Request ID is required'}, status=400)
+        team_request = get_object_or_404(TeamMemberRequest, id=request_id)
+        if team_request.user != request.user:
+            logger.warning(f"User {request.user.username} attempted to delete team request {request_id} they do not own")
+            return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to delete this request'}, status=403)
+        project_name = team_request.project_name
+        team_request.delete()
+        logger.info(f"Team request '{project_name}' deleted by user {request.user.username}")
+        return JsonResponse({'status': 'Success', 'message': 'Team member request deleted successfully'})
     return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
 
 @login_required
 def apply_team_request(request):
     if request.method == 'POST':
-        try:
-            import json
-            data = json.loads(request.body)
-            request_id = data.get('request_id')
-            message = data.get('message', '')
-            if not request_id:
-                return JsonResponse({'status': 'Failed', 'message': 'Request ID is required'}, status=400)
-            team_request = get_object_or_404(TeamMemberRequest, id=request_id)
-            if team_request.user == request.user:
-                return JsonResponse({'status': 'Failed', 'message': 'You cannot apply to your own request'}, status=400)
-            application, created = TeamMemberApplication.objects.get_or_create(
-                user=request.user,
-                team_request=team_request,
-                defaults={'message': message}
-            )
-            if not created:
-                logger.info(f"User {request.user.username} attempted to apply again to team request {team_request.project_name}")
-                return JsonResponse({'status': 'Failed', 'message': 'You have already applied to this request'}, status=400)
-            logger.info(f"User {request.user.username} applied to team request {team_request.project_name}")
-            return JsonResponse({
-                'status': 'Success',
-                'message': 'Application submitted successfully'
-            })
-        except Exception as e:
-            logger.error(f"Error applying to team request for user {request.user.username}: {str(e)}")
-            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'}, status=500)
+        data = json.loads(request.body)
+        request_id = data.get('request_id')
+        message = data.get('message', '')
+        what_you_can_do = data.get('what_you_can_do', '')
+        github_url = data.get('github_url', '')
+        if not request_id or not github_url:
+            return JsonResponse({'status': 'Failed', 'message': 'Request ID and GitHub URL are required'}, status=400)
+        if not re.match(r'^https:\/\/github\.com\/[a-zA-Z0-9-]+$', github_url):
+            logger.warning(f"Invalid GitHub URL provided by {request.user.username}: {github_url}")
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid GitHub URL format (e.g., https://github.com/username)'}, status=400)
+        team_request = get_object_or_404(TeamMemberRequest, id=request_id)
+        if team_request.user == request.user:
+            return JsonResponse({'status': 'Failed', 'message': 'You cannot apply to your own request'}, status=400)
+        application, created = TeamMemberApplication.objects.get_or_create(
+            user=request.user,
+            team_request=team_request,
+            defaults={
+                'message': message,
+                'what_you_can_do': what_you_can_do,
+                'github_url': github_url
+            }
+        )
+        if not created:
+            logger.info(f"User {request.user.username} attempted to apply again to team request {team_request.project_name}")
+            return JsonResponse({'status': 'Failed', 'message': 'You have already applied to this request'}, status=400)
+        logger.info(f"User {request.user.username} applied to team request {team_request.project_name}")
+        return JsonResponse({
+            'status': 'Success',
+            'message': 'Application submitted successfully'
+        })
     return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
 
-@login_required
+@login_required(login_url='/login/')
 def team_request_detail(request, request_id):
     team_request = get_object_or_404(TeamMemberRequest, id=request_id)
     is_owner = team_request.user == request.user
@@ -293,35 +291,30 @@ def team_requests(request):
 @login_required
 def manage_team_application(request):
     if request.method == 'POST':
-        try:
-            import json
-            data = json.loads(request.body)
-            application_id = data.get('application_id')
-            action = data.get('action')
-            if not application_id or not action:
-                return JsonResponse({'status': 'Failed', 'message': 'Application ID and action are required'}, status=400)
-            application = get_object_or_404(TeamMemberApplication, id=application_id)
-            if application.team_request.user != request.user:
-                logger.warning(f"User {request.user.username} attempted to manage application {application_id} they do not own")
-                return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to manage this application'}, status=403)
-            if action not in ['accept', 'reject']:
-                return JsonResponse({'status': 'Failed', 'message': 'Invalid action'}, status=400)
-            application.status = 'Accepted' if action == 'accept' else 'Rejected'
-            application.save()
-            Notification.objects.create(
-                user=application.user,
-                team_request=application.team_request,
-                status=application.status,
-                read=False
-            )
-            logger.info(f"Application {application_id} {action}ed by user {request.user.username} for team request {application.team_request.project_name}")
-            return JsonResponse({
-                'status': 'Success',
-                'message': f'Application {action}ed successfully'
-            })
-        except Exception as e:
-            logger.error(f"Error managing application for user {request.user.username}: {str(e)}")
-            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'}, status=500)
+        data = json.loads(request.body)
+        application_id = data.get('application_id')
+        action = data.get('action')
+        if not application_id or not action:
+            return JsonResponse({'status': 'Failed', 'message': 'Application ID and action are required'}, status=400)
+        application = get_object_or_404(TeamMemberApplication, id=application_id)
+        if application.team_request.user != request.user:
+            logger.warning(f"User {request.user.username} attempted to manage application {application_id} they do not own")
+            return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to manage this application'}, status=403)
+        if action not in ['accept', 'reject']:
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid action'}, status=400)
+        application.status = 'Accepted' if action == 'accept' else 'Rejected'
+        application.save()
+        Notification.objects.create(
+            user=application.user,
+            team_request=application.team_request,
+            status=application.status,
+            read=False
+        )
+        logger.info(f"Application {application_id} {action}ed by user {request.user.username} for team request {application.team_request.project_name}")
+        return JsonResponse({
+            'status': 'Success',
+            'message': f'Application {action}ed successfully'
+        })
     return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
 
 @login_required
@@ -441,58 +434,261 @@ def upload_project(request):
     if request.method == 'GET':
         return render(request, 'upload-project.html')
     elif request.method == 'POST':
-        if request.user.is_authenticated:
-            name = request.POST.get('name')
-            description = request.POST.get('description', '')
-            project_type = request.POST.get('type', '')
-            github_link = request.POST.get('github_link', '')
-            if not name or not project_type:
-                return JsonResponse({'status': 'Failed', 'message': 'Project name and type are required'}, status=400)
-            if github_link and not re.match(r'^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+$', github_link):
-                logger.warning(f"Invalid GitHub link provided by {request.user.username}: {github_link}")
-                return JsonResponse({'status': 'Failed', 'message': 'Invalid GitHub link format'}, status=400)
-            max_size = 10 * 1024 * 1024
-            if 'videos' in request.FILES:
-                for video in request.FILES.getlist('videos'):
-                    if video.size > max_size:
-                        logger.warning(f"Video {video.name} exceeds 10MB for user {request.user.username}")
-                        return JsonResponse({'status': 'Failed', 'message': f'Video {video.name} exceeds 10MB'}, status=400)
+        name = request.POST.get('name')
+        description = request.POST.get('description', '')
+        project_type = request.POST.get('type', '')
+        github_link = request.POST.get('github_link', '')
+        hosted_link = request.POST.get('hosted_link', '')
+        images = request.FILES.getlist('images')
+        videos = request.FILES.getlist('videos')
+        
+        if not name or not project_type:
+            return JsonResponse({'status': 'Failed', 'message': 'Project name and type are required'}, status=400)
+        if not images:
+            return JsonResponse({'status': 'Failed', 'message': 'At least one image is required'}, status=400)
+        if github_link and not re.match(r'^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+$', github_link):
+            logger.warning(f"Invalid GitHub link provided by {request.user.username}: {github_link}")
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid GitHub link format'}, status=400)
+        if hosted_link and not re.match(r'^https?:\/\/[^\s/$.?#].[^\s]*$', hosted_link):
+            logger.warning(f"Invalid hosted link provided by {request.user.username}: {hosted_link}")
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid Project Hosted link format'}, status=400)
+
+        try:
+            image_urls = []
+            for image in images:
+                # Generate file_name from the original file name, sanitized
+                file_name = os.path.splitext(image.name)[0].replace(' ', '_').lower()
+                image_url = upload_to_cloudinary(image, file_name, resource_type='image')
+                if image_url:
+                    image_urls.append(image_url)
+                else:
+                    logger.error(f"Failed to upload image for project {name} by {request.user.username}")
+                    return JsonResponse({'status': 'Failed', 'message': 'Failed to upload image(s)'}, status=500)
+
+            video_urls = []
+            for video in videos:
+                if video.size > 10 * 1024 * 1024:  # 10MB limit
+                    logger.warning(f"Video file too large for project {name} by {request.user.username}: {video.name}")
+                    return JsonResponse({'status': 'Failed', 'message': f'Video {video.name} exceeds 10MB limit'}, status=400)
+                # Generate file_name for video
+                file_name = os.path.splitext(video.name)[0].replace(' ', '_').lower()
+                video_url = upload_to_cloudinary(video, file_name, resource_type='video')
+                if video_url:
+                    video_urls.append(video_url)
+                else:
+                    logger.error(f"Failed to upload video for project {name} by {request.user.username}")
+                    return JsonResponse({'status': 'Failed', 'message': 'Failed to upload video(s)'}, status=500)
+
             project = Project.objects.create(
                 user=request.user,
                 name=name,
                 type=project_type,
                 description=description,
-                github_link=github_link
+                github_link=github_link if github_link else None,
+                hosted_link=hosted_link if hosted_link else None,
+                image_urls=','.join(image_urls),
+                video_urls=','.join(video_urls) if video_urls else None
             )
-            if 'images' in request.FILES:
-                images = request.FILES.getlist('images')
+            logger.info(f"Project '{name}' uploaded by user {request.user.username}")
+            return JsonResponse({
+                'status': 'Success',
+                'message': 'Project uploaded successfully',
+                'project_id': project.id,
+                'redirect': '/uploaded-projects/'
+            })
+        except Exception as e:
+            logger.error(f"Error uploading project for user {request.user.username}: {str(e)}")
+            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'}, status=500)
+    return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
+
+@login_required(login_url='/login/')
+def edit_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    if project.user != request.user:
+        logger.warning(f"User {request.user.username} attempted to edit project {project_id} they do not own")
+        return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to edit this project'}, status=403)
+    
+    if request.method == 'GET':
+        return render(request, 'upload-project.html', {'project': project})
+    elif request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description', '')
+        project_type = request.POST.get('type', '')
+        github_link = request.POST.get('github_link', '')
+        hosted_link = request.POST.get('hosted_link', '')
+        images = request.FILES.getlist('images')
+        videos = request.FILES.getlist('videos')
+        
+        if not name or not project_type:
+            return JsonResponse({'status': 'Failed', 'message': 'Project name and type are required'}, status=400)
+        if not images and not project.image_urls:
+            return JsonResponse({'status': 'Failed', 'message': 'At least one image is required'}, status=400)
+        if github_link and not re.match(r'^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+$', github_link):
+            logger.warning(f"Invalid GitHub link provided by {request.user.username}: {github_link}")
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid GitHub link format'}, status=400)
+        if hosted_link and not re.match(r'^https?:\/\/[^\s/$.?#].[^\s]*$', hosted_link):
+            logger.warning(f"Invalid hosted link provided by {request.user.username}: {hosted_link}")
+            return JsonResponse({'status': 'Failed', 'message': 'Invalid Project Hosted link format'}, status=400)
+
+        try:
+            image_urls = project.image_urls.split(',') if project.image_urls else []
+            if images:
+                # Delete existing images from Cloudinary
+                for url in image_urls:
+                    if url.strip():
+                        try:
+                            public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
+                            if public_id_match:
+                                public_id = public_id_match.group(1)
+                                cloudinary.uploader.destroy(public_id, resource_type='image')
+                                logger.info(f"Deleted Cloudinary image: {public_id}")
+                        except Exception as e:
+                            logger.warning(f"Failed to delete Cloudinary image {url}: {str(e)}")
                 image_urls = []
                 for image in images:
-                    try:
-                        image_url = upload_to_cloudinary(image, image.name, resource_type='image')
+                    # Generate file_name for image
+                    file_name = os.path.splitext(image.name)[0].replace(' ', '_').lower()
+                    image_url = upload_to_cloudinary(image, file_name, resource_type='image')
+                    if image_url:
                         image_urls.append(image_url)
-                        logger.info(f"Uploaded image {image.name} to Cloudinary: {image_url}")
-                    except Exception as e:
-                        logger.error(f"Failed to upload image {image.name}: {e}")
-                if image_urls:
-                    project.image_urls = ','.join(image_urls)
-            if 'videos' in request.FILES:
-                videos = request.FILES.getlist('videos')
+                    else:
+                        logger.error(f"Failed to upload image for project {name} by {request.user.username}")
+                        return JsonResponse({'status': 'Failed', 'message': 'Failed to upload image(s)'}, status=500)
+            
+            video_urls = project.video_urls.split(',') if project.video_urls else []
+            if videos:
+                # Delete existing videos from Cloudinary
+                for url in video_urls:
+                    if url.strip():
+                        try:
+                            public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
+                            if public_id_match:
+                                public_id = public_id_match.group(1)
+                                cloudinary.uploader.destroy(public_id, resource_type='video')
+                                logger.info(f"Deleted Cloudinary video: {public_id}")
+                        except Exception as e:
+                            logger.warning(f"Failed to delete Cloudinary video {url}: {str(e)}")
                 video_urls = []
                 for video in videos:
-                    try:
-                        video_url = upload_to_cloudinary(video, video.name, resource_type='video')
+                    if video.size > 10 * 1024 * 1024:  # 10MB limit
+                        logger.warning(f"Video file too large for project {name} by {request.user.username}: {video.name}")
+                        return JsonResponse({'status': 'Failed', 'message': f'Video {video.name} exceeds 10MB limit'}, status=400)
+                    # Generate file_name for video
+                    file_name = os.path.splitext(video.name)[0].replace(' ', '_').lower()
+                    video_url = upload_to_cloudinary(video, file_name, resource_type='video')
+                    if video_url:
                         video_urls.append(video_url)
-                        logger.info(f"Uploaded video {video.name} to Cloudinary: {video_url}")
-                    except Exception as e:
-                        logger.error(f"Failed to upload video {video.name}: {e}")
-                if video_urls:
-                    project.video_urls = ','.join(video_urls)
+                    else:
+                        logger.error(f"Failed to upload video for project {name} by {request.user.username}")
+                        return JsonResponse({'status': 'Failed', 'message': 'Failed to upload video(s)'}, status=500)
+
+            project.name = name
+            project.type = project_type
+            project.description = description
+            project.github_link = github_link if github_link else None
+            project.hosted_link = hosted_link if hosted_link else None
+            project.image_urls = ','.join(image_urls)
+            project.video_urls = ','.join(video_urls) if video_urls else None
             project.save()
-            logger.info(f"Project {name} uploaded by user {request.user.username}")
-            return JsonResponse({'status': 'Success', 'message': 'Project uploaded successfully', 'project_id': project.id})
-        return JsonResponse({'status': 'Failed', 'message': 'Authentication required'}, status=403)
+            
+            logger.info(f"Project '{name}' edited by user {request.user.username}")
+            return JsonResponse({
+                'status': 'Success',
+                'message': 'Project updated successfully',
+                'redirect': '/uploaded-projects/'
+            })
+        except Exception as e:
+            logger.error(f"Error editing project {project_id} for user {request.user.username}: {str(e)}")
+            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'}, status=500)
     return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
+
+@login_required
+def delete_project(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        project_id = data.get('project_id')
+        if not project_id:
+            return JsonResponse({'status': 'Failed', 'message': 'Project ID is required'}, status=400)
+        project = get_object_or_404(Project, id=project_id)
+        if project.user != request.user:
+            logger.warning(f"User {request.user.username} attempted to delete project {project_id} they do not own")
+            return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to delete this project'}, status=403)
+        
+        if project.image_urls:
+            image_urls = project.image_urls.split(',')
+            for url in image_urls:
+                if url.strip():
+                    try:
+                        public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
+                        if public_id_match:
+                            public_id = public_id_match.group(1)
+                            result = cloudinary.uploader.destroy(public_id, resource_type='image')
+                            if result.get('result') == 'ok':
+                                logger.info(f"Deleted Cloudinary image: {public_id}")
+                            else:
+                                logger.warning(f"Failed to delete Cloudinary image {public_id}: {result}")
+                    except Exception as e:
+                        logger.warning(f"Error deleting Cloudinary image {url}: {str(e)}")
+        
+        if project.video_urls:
+            video_urls = project.video_urls.split(',')
+            for url in video_urls:
+                if url.strip():
+                    try:
+                        public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
+                        if public_id_match:
+                            public_id = public_id_match.group(1)
+                            result = cloudinary.uploader.destroy(public_id, resource_type='video')
+                            if result.get('result') == 'ok':
+                                logger.info(f"Deleted Cloudinary video: {public_id}")
+                            else:
+                                logger.warning(f"Failed to delete Cloudinary video {public_id}: {result}")
+                    except Exception as e:
+                        logger.warning(f"Error deleting Cloudinary video {url}: {str(e)}")
+        
+        project_name = project.name
+        Like.objects.filter(project=project).delete()
+        logger.info(f"Deleted likes for project {project_name}")
+        
+        project.delete()
+        logger.info(f"Project '{project_name}' deleted by user {request.user.username}")
+        return JsonResponse({'status': 'Success', 'message': 'Project deleted successfully'})
+    return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
+
+@login_required
+def toggle_like(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        project_id = data.get('project_id')
+        if not project_id:
+            return JsonResponse({'status': 'Failed', 'message': 'Project ID is required'}, status=400)
+        project = get_object_or_404(Project, id=project_id)
+        like, created = Like.objects.get_or_create(user=request.user, project=project)
+        if not created:
+            like.delete()
+            logger.info(f"User {request.user.username} unliked project {project.name}")
+            return JsonResponse({
+                'status': 'Success',
+                'message': 'Unliked',
+                'like_count': project.like_count,
+                'action': 'unliked'
+            })
+        logger.info(f"User {request.user.username} liked project {project.name}")
+        return JsonResponse({
+            'status': 'Success',
+            'message': 'Liked',
+            'like_count': project.like_count,
+            'action': 'liked'
+        })
+    return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
+
+@login_required
+def user_project_detail(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    if project.user != request.user:
+        logger.warning(f"User {request.user.username} attempted to access project {project_id} they do not own")
+        return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to view this project'}, status=403)
+    return render(request, 'user_project_detail.html', {'project': project})
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -516,7 +712,10 @@ def login_view(request):
                 if user.is_active:
                     login(request, user)
                     logger.info(f"User {email_lower} logged in successfully")
-                    return JsonResponse({'status': 'Success', 'redirect': '/'})
+                    next_url = request.session.get('next', '/')
+                    if 'next' in request.session:
+                        del request.session['next']
+                    return JsonResponse({'status': 'Success', 'redirect': next_url})
                 else:
                     logger.warning(f"Login attempted by unverified user {email_lower}")
                     return JsonResponse({'status': 'Failed', 'message': 'User not verified. Please verify your email.'}, status=403)
@@ -548,10 +747,8 @@ def reset_password(request):
             logger.warning(f"Password reset attempt for unregistered email {email_lower}")
             return JsonResponse({'status': 'Failed', 'message': 'Email not found'}, status=400)
         try:
-            logger.debug(f"DEFAULT_FROM_EMAIL: {settings.DEFAULT_FROM_EMAIL}")
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            # Conditionally set scheme based on environment
             host = request.get_host()
             scheme = 'http' if host.startswith(('127.0.0.1', 'localhost')) else 'https'
             reset_link = f"{scheme}://{host}/reset_password_confirm/{uid}/{token}/"
@@ -562,11 +759,10 @@ def reset_password(request):
                 'reset_link': reset_link,
                 'sent_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S %Z'),
             })
-            logger.debug(f"Rendered email content: {message}")
             email_message = EmailMessage(
                 subject=subject,
                 body=message,
-                from_email=formataddr(('Projects Zone', settings.EMAIL_HOST_USER)),  # Use EMAIL_HOST_USER
+                from_email=formataddr(('Projects Zone', settings.EMAIL_HOST_USER)),
                 to=[email_lower]
             )
             email_message.content_subtype = 'html'
@@ -581,7 +777,7 @@ def reset_password(request):
 def password_reset_confirm(request, uidb64, token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
-        logger.debug(f"Decoded UID: {uid}")  # Debug UID
+        logger.debug(f"Decoded UID: {uid}")
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
         logger.error(f"Error decoding UID or finding user: {str(e)}")
@@ -631,136 +827,9 @@ def change_password(request):
     return render(request, 'change-password.html')
 
 @login_required
-def toggle_like(request):
-    if request.method == 'POST':
-        try:
-            import json
-            data = json.loads(request.body)
-            project_id = data.get('project_id')
-            if not project_id:
-                return JsonResponse({'status': 'Failed', 'message': 'Project ID is required'}, status=400)
-            project = get_object_or_404(Project, id=project_id)
-            like, created = Like.objects.get_or_create(user=request.user, project=project)
-            if not created:
-                like.delete()
-                logger.info(f"User {request.user.username} unliked project {project.name}")
-                return JsonResponse({
-                    'status': 'Success',
-                    'message': 'Unliked',
-                    'like_count': project.like_count,
-                    'action': 'unliked'
-                })
-            else:
-                logger.info(f"User {request.user.username} liked project {project.name}")
-                return JsonResponse({
-                    'status': 'Success',
-                    'message': 'Liked',
-                    'like_count': project.like_count,
-                    'action': 'liked'
-                })
-        except Exception as e:
-            logger.error(f"Error toggling like for user {request.user.username}: {str(e)}")
-            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'}, status=500)
-    return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
-
-@login_required
 def user_project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     if project.user != request.user:
         logger.warning(f"User {request.user.username} attempted to access project {project_id} they do not own")
         return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to view this project'}, status=403)
     return render(request, 'user_project_detail.html', {'project': project})
-
-@login_required
-def edit_project(request):
-    if request.method == 'POST':
-        try:
-            import json
-            data = json.loads(request.body)
-            project_id = data.get('project_id')
-            name = data.get('name')
-            description = data.get('description', '')
-            project_type = data.get('type', '')
-            github_link = data.get('github_link', '')
-            if not project_id or not name or not project_type:
-                return JsonResponse({'status': 'Failed', 'message': 'Project ID, name, and type are required'}, status=400)
-            project = get_object_or_404(Project, id=project_id)
-            if project.user != request.user:
-                logger.warning(f"User {request.user.username} attempted to edit project {project_id} they do not own")
-                return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to edit this project'}, status=403)
-            if github_link and not re.match(r'^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+$', github_link):
-                logger.warning(f"Invalid GitHub link provided by {request.user.username}: {github_link}")
-                return JsonResponse({'status': 'Failed', 'message': 'Invalid GitHub link format'}, status=400)
-            project.name = name
-            project.description = description
-            project.type = project_type
-            project.github_link = github_link
-            project.save()
-            logger.info(f"Project {name} edited by user {request.user.username}")
-            return JsonResponse({'status': 'Success', 'message': 'Project updated successfully'})
-        except Exception as e:
-            logger.error(f"Error editing project for user {request.user.username}: {str(e)}")
-            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'}, status=500)
-    return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
-
-@login_required
-def delete_project(request):
-    if request.method == 'POST':
-        try:
-            import json
-            data = json.loads(request.body)
-            project_id = data.get('project_id')
-            if not project_id:
-                return JsonResponse({'status': 'Failed', 'message': 'Project ID is required'}, status=400)
-            project = get_object_or_404(Project, id=project_id)
-            if project.user != request.user:
-                logger.warning(f"User {request.user.username} attempted to delete project {project_id} they do not own")
-                return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to delete this project'}, status=403)
-            
-            if project.image_urls:
-                image_urls = project.image_urls.split(',')
-                for url in image_urls:
-                    if url.strip():
-                        try:
-                            public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
-                            if public_id_match:
-                                public_id = public_id_match.group(1)
-                                result = cloudinary.uploader.destroy(public_id, resource_type='image')
-                                if result.get('result') == 'ok':
-                                    logger.info(f"Deleted Cloudinary image: {public_id}")
-                                else:
-                                    logger.warning(f"Failed to delete Cloudinary image {public_id}: {result}")
-                            else:
-                                logger.warning(f"Could not extract public_id from image URL: {url}")
-                        except Exception as e:
-                            logger.error(f"Error deleting Cloudinary image {url}: {str(e)}")
-            
-            if project.video_urls:
-                video_urls = project.video_urls.split(',')
-                for url in video_urls:
-                    if url.strip():
-                        try:
-                            public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
-                            if public_id_match:
-                                public_id = public_id_match.group(1)
-                                result = cloudinary.uploader.destroy(public_id, resource_type='video')
-                                if result.get('result') == 'ok':
-                                    logger.info(f"Deleted Cloudinary video: {public_id}")
-                                else:
-                                    logger.warning(f"Failed to delete Cloudinary video {public_id}: {result}")
-                            else:
-                                logger.warning(f"Could not extract public_id from video URL: {url}")
-                        except Exception as e:
-                            logger.error(f"Error deleting Cloudinary video {url}: {str(e)}")
-            
-            project_name = project.name
-            Like.objects.filter(project=project).delete()
-            logger.info(f"Deleted likes for project {project_name}")
-            
-            project.delete()
-            logger.info(f"Project {project_name} deleted by user {request.user.username}")
-            return JsonResponse({'status': 'Success', 'message': 'Project deleted successfully'})
-        except Exception as e:
-            logger.error(f"Error deleting project for user {request.user.username}: {str(e)}")
-            return JsonResponse({'status': 'Failed', 'message': 'An unexpected error occurred'}, status=500)
-    return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)

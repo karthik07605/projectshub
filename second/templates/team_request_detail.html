@@ -169,8 +169,6 @@
         }
 
         .action-section {
-            display: flex;
-            gap: 16px;
             margin-top: 24px;
         }
 
@@ -179,13 +177,14 @@
             color: var(--white);
             border: none;
             padding: 12px 24px;
+            margin-top: 12px;
             border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
-            flex: 1;
+            width: 100%;
         }
 
         .action-btn:hover {
@@ -360,7 +359,7 @@
             color: var(--white);
         }
 
-        .application-message {
+        .application-message, .application-what-you-can-do, .application-github {
             font-size: 0.9rem;
             color: var(--gray-600);
             margin-bottom: 12px;
@@ -409,6 +408,61 @@
             display: block;
         }
 
+        .notice-section {
+            background: var(--light-blue);
+            border: 2px solid var(--bark-blue-400);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 24px 0;
+            text-align: center;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(64, 128, 191, 0.1);
+        }
+
+        .application-form {
+            margin-top: 24px;
+            padding: 16px;
+            background: var(--white);
+            border: 1px solid var(--bark-blue-100);
+            border-radius: 12px;
+        }
+
+        .application-form label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--bark-blue-700);
+            margin-bottom: 8px;
+        }
+
+        .application-form input[type="url"],
+        .application-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--bark-blue-200);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .application-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .application-form input[type="url"]:focus,
+        .application-form textarea:focus {
+            outline: none;
+            border-color: var(--bark-blue-400);
+            box-shadow: 0 0 0 3px rgba(64, 128, 191, 0.1);
+        }
+
+        .application-form .form-group {
+            margin-bottom: 16px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 12px;
@@ -421,10 +475,6 @@
             .detail-card {
                 padding: 20px;
                 border-radius: 16px;
-            }
-
-            .action-section {
-                flex-direction: column;
             }
 
             .action-btn {
@@ -528,7 +578,7 @@
                 padding: 3px 8px;
             }
 
-            .application-message {
+            .application-message, .application-what-you-can-do, .application-github {
                 font-size: 0.85rem;
             }
         }
@@ -536,7 +586,7 @@
 </head>
 <body>
     <div class="container">
-        <button class="back-btn" onclick="history.back()">
+        <button class="back-btn" onclick="window.location.href='/'">
             <i class="fas fa-arrow-left"></i> Go Back
         </button>
 
@@ -602,6 +652,12 @@
                 </div>
             </div>
 
+            {% if user.is_authenticated %}
+                <div class="notice-section">
+                    <i class="fas fa-info-circle"></i> Important: Your application will be evaluated based on your GitHub account and uploaded projects. Ensure they are up-to-date!
+                </div>
+            {% endif %}
+
             <div class="action-section">
                 {% if user.is_authenticated %}
                     {% if user == team_request.user %}
@@ -610,7 +666,21 @@
                     {% elif has_applied %}
                         <button class="action-btn disabled" disabled>Application Submitted</button>
                     {% else %}
-                        <button class="action-btn" onclick="applyRequest({{ team_request.id }})">Apply to Join</button>
+                        <div class="application-form">
+                            <div class="form-group">
+                                <label for="github-url">GitHub Profile URL (Required)</label>
+                                <input type="url" id="github-url" placeholder="https://github.com/username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="application-message">Application Message (Optional)</label>
+                                <textarea id="application-message" placeholder="Write a brief message for your application..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="what-you-can-do">What You Can Do (Optional)</label>
+                                <textarea id="what-you-can-do" placeholder="Describe your skills and contributions to the project..."></textarea>
+                            </div>
+                            <button class="action-btn" onclick="applyRequest({{ team_request.id }})">Apply to Join</button>
+                        </div>
                     {% endif %}
                 {% else %}
                     <button class="action-btn" onclick="navigateTo('/login/')">Sign In to Apply</button>
@@ -635,9 +705,17 @@
                         <h4>{{ application.user.profile.name }}</h4>
                         <span class="application-status {{ application.status|lower }}">{{ application.status }}</span>
                     </div>
+                    <div class="application-github">
+                        <strong>GitHub:</strong> <a href="{{ application.github_url }}" target="_blank">{{ application.github_url }}</a>
+                    </div>
                     {% if application.message %}
                     <div class="application-message">
                         <strong>Message:</strong> {{ application.message }}
+                    </div>
+                    {% endif %}
+                    {% if application.what_you_can_do %}
+                    <div class="application-what-you-can-do">
+                        <strong>What They Can Do:</strong> {{ application.what_you_can_do }}
                     </div>
                     {% endif %}
                     {% if application.status == 'Pending' %}
@@ -681,14 +759,25 @@
         }
 
         function applyRequest(requestId) {
-            const message = prompt('Enter a brief message for your application (optional):');
+            const githubUrl = document.getElementById('github-url').value;
+            const message = document.getElementById('application-message').value;
+            const whatYouCanDo = document.getElementById('what-you-can-do').value;
+            if (!githubUrl) {
+                alert('Please provide your GitHub URL.');
+                return;
+            }
             fetch('/apply-team-request/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken,
                 },
-                body: JSON.stringify({ request_id: requestId, message: message || '' })
+                body: JSON.stringify({ 
+                    request_id: requestId, 
+                    message: message, 
+                    what_you_can_do: whatYouCanDo,
+                    github_url: githubUrl
+                })
             })
             .then(response => response.json())
             .then(data => {

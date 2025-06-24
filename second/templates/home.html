@@ -1383,7 +1383,7 @@
         </div>
         <div class="auth-section">
             {% if user.is_authenticated %}
-                <span class="notification-icon" onclick="window.location.href='/application-status/'">
+                <span class="notification-icon" onclick="markNotificationsAsRead(); window.location.href='/application-status/'">
                     <i class="fas fa-bell"></i>
                     {% if notifications|length > 0 %}
                         <span class="notification-badge">{{ notifications|length }}</span>
@@ -1407,11 +1407,14 @@
             <li><a href="#iot" onclick="filterProjects('iot'); toggleSideMenu();" class="nav-link">IoT Projects</a></li>
             <li><a href="#computer" onclick="filterProjects('computer'); toggleSideMenu();" class="nav-link">Computer Projects</a></li>
             <li><a href="#mechanical" onclick="filterProjects('mechanical'); toggleSideMenu();" class="nav-link">Mechanical Projects</a></li>
-            <li><a href="#teamrequests" onclick="filterProjects('teamrequests'); toggleSideMenu();" class="nav-link">Team Requests</a></li>
+            <li><a href="#teamrequests" onclick="filterProjects('teamrequests'); toggleSideMenu();" class="nav-link">Join a team</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="/userprofile/" onclick="toggleSideMenu();" class="nav-link">Your Profile</a></li>
+            {% endif %}
         </ul>
         <div class="auth-section">
             {% if user.is_authenticated %}
-                <span class="notification-icon" onclick="window.location.href='/application-status/'; toggleSideMenu();">
+                <span class="notification-icon" onclick="markNotificationsAsRead(); window.location.href='/application-status/'; toggleSideMenu();">
                     <i class="fas fa-bell"></i>
                     {% if notifications|length > 0 %}
                         <span class="notification-badge">{{ notifications|length }}</span>
@@ -1432,77 +1435,66 @@
             <li><a href="#iot" onclick="filterProjects('iot')" class="nav-link">IoT Projects</a></li>
             <li><a href="#computer" onclick="filterProjects('computer')" class="nav-link">Computer Projects</a></li>
             <li><a href="#mechanical" onclick="filterProjects('mechanical')" class="nav-link">Mechanical Projects</a></li>
-            <li><a href="#teamrequests" onclick="filterProjects('teamrequests')" class="nav-link">Team Requests</a></li>
+            <li><a href="#teamrequests" onclick="filterProjects('teamrequests')" class="nav-link">Join a team</a></li>
         </ul>
     </nav>
 
     <main class="main-content">
-        {% if user.is_authenticated and notifications %}
-        <section class="notification-section">
-            <h3>Notifications</h3>
-            {% for notification in notifications %}
-            <div class="notification-card">
-                <span class="notification-message">
-                    Your application for <a href="/team-request/{{ notification.team_request.id }}/">{{ notification.team_request.project_name }}</a> has been {{ notification.status|lower }}.
-                </span>
-                <span class="notification-status {{ notification.status|lower }}">{{ notification.status }}</span>
-            </div>
-            {% endfor %}
-        </section>
-        {% endif %}
         <section id="uploaded-projects">
             <h2 class="category-title" id="categoryTitle">All Projects</h2>
             <div class="project-grid" id="projectGrid">
                 {% for item in items %}
-                <div class="project-card" data-type="{{ item.type }}" data-name="{{ item.name|lower }}" data-author="{{ item.user.profile.name|lower }}">
-                    {% if item.image_urls %}
-                        <img src="{{ item.image_urls.0 }}" alt="{{ item.name }}" class="project-image" onerror="this.src='https://via.placeholder.com/320x200/dbeafe/3b82f6?text=Image+Not+Found';">
-                    {% elif item.type == 'teamrequests' %}
-                        <img src="https://res.cloudinary.com/dxs85zu0x/image/upload/v1750584169/project_uploads/ChatGPT%20Image%20Jun%2022%2C%202025%2C%2002_50_34%20PM.png.png" alt="{{ item.name }}" class="project-image">
-                    {% else %}
-                        <div class="project-image" style="background: linear-gradient(135deg, #dbeafe, #f1f5f9); display:flex; align-items:center; justify-content:center; font-weight:600; color:#64748b; font-size:16px; text-align:center;">
-                            <i class="fas fa-image" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
-                            No Image Available
-                        </div>
-                    {% endif %}
-                    <div class="project-details">
-                        <a href="{% if item.is_project %}/project/{{ item.id }}/{% else %}/team-request/{{ item.id }}/{% endif %}" 
-                           {% if not item.is_project and not user.is_authenticated %}onclick="alert('Please sign in to view team request details.'); window.location.href='/login/'; return false;"{% endif %}
-                           class="project-title">{{ item.name }}</a>
-                        <p class="project-type"><i class="fas fa-tag"></i>
-                            {% if item.type == 'teamrequests' %}Team Request{% else %}{{ item.type|capfirst }}{% endif %}
-                        </p>
-                        <p class="posted-by"><i class="fas fa-user"></i>{{ item.user.profile.name }}</p>
-                        <p class="posted-date"><i class="fas fa-calendar-alt"></i>{{ item.created_at|date:"F d, Y" }}</p>
-                        <div class="like-section">
-                            {% if item.is_project %}
-                            <button class="like-btn" 
-                                    onclick="toggleLike({{ item.id }}, this, '{{ user.is_authenticated|yesno:"true,false" }}')" 
-                                    style="{% if user.is_authenticated and item.id in liked_projects %}color: #dc2626;{% endif %}">
-                                <i class="fas fa-heart"></i>
-                            </button>
-                            <span class="like-count">{{ item.like_count }} Likes</span>
-                            <button class="like-btn share-btn" 
-                                    onclick="shareItem('{{ item.name|escapejs }}', {% if item.is_project %}'project'{% else %}'team-request'{% endif %}, {{ item.id }})"
-                                    title="Share this {% if item.is_project %}project{% else %}team request{% endif %}">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                            <span class="share-feedback" id="share-feedback-{{ item.id }}" style="display: none; font-size: 14px; color: var(--success);">Link copied!</span>
-                            {% else %}
-                            <button class="like-btn" disabled style="color: var(--text-light); cursor: not-allowed;" title="Likes not available for team requests">
-                                <i class="fas fa-heart"></i>
-                            </button>
-                            <span class="like-count">N/A</span>
-                            <button class="like-btn share-btn" 
-                                    onclick="shareItem('{{ item.name|escapejs }}', 'team-request', {{ item.id }})"
-                                    title="Share this team request">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                            <span class="share-feedback" id="share-feedback-{{ item.id }}" style="display: none; font-size: 14px; color: var(--success);">Link copied!</span>
-                            {% endif %}
+                <a href="{% if item.is_project %}/project/{{ item.id }}/{% else %}/team-request/{{ item.id }}/{% endif %}" 
+                   {% if not item.is_project and not user.is_authenticated %}onclick="alert('Please sign in to view team request details.'); window.location.href='/login/'; return false;"{% endif %}
+                   style="text-decoration: none; color: inherit;">
+                    <div class="project-card" data-type="{{ item.type }}" data-name="{{ item.name|lower }}" data-author="{{ item.user.profile.name|lower }}">
+                        {% if item.image_urls %}
+                            <img src="{{ item.image_urls.0 }}" alt="{{ item.name }}" class="project-image" onerror="this.src='https://via.placeholder.com/320x200/dbeafe/3b82f6?text=Image+Not+Found';">
+                        {% elif item.type == 'teamrequests' %}
+                            <img src="https://res.cloudinary.com/dxs85zu0x/image/upload/v1750584169/project_Uploads/ChatGPT%20Image%20Jun%2022%2C%202025%2C%2002_50_34%20PM.png.png" alt="{{ item.name }}" class="project-image">
+                        {% else %}
+                            <div class="project-image" style="background: linear-gradient(135deg, #dbeafe, #f1f5f9); display:flex; align-items:center; justify-content:center; font-weight:600; color:#64748b; font-size:16px; text-align:center;">
+                                <i class="fas fa-image" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
+                                No Image Available
+                            </div>
+                        {% endif %}
+                        <div class="project-details">
+                            <span class="project-title">{{ item.name }}</span>
+                            <p class="project-type"><i class="fas fa-tag"></i>
+                                {% if item.type == 'teamrequests' %}Join a team{% else %}{{ item.type|capfirst }}{% endif %}
+                            </p>
+                            <p class="posted-by"><i class="fas fa-user"></i>{{ item.user.profile.name }}</p>
+                            <p class="posted-date"><i class="fas fa-calendar-alt"></i>{{ item.created_at|date:"F d, Y" }}</p>
+                            <div class="like-section">
+                                {% if item.is_project %}
+                                <button class="like-btn" 
+                                        onclick="event.stopPropagation(); toggleLike({{ item.id }}, this, '{{ user.is_authenticated|yesno:"true,false" }}')" 
+                                        style="{% if user.is_authenticated and item.id in liked_projects %}color: #dc2626;{% endif %}">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                                <span class="like-count">{{ item.like_count }} Likes</span>
+                                <button class="like-btn share-btn" 
+                                        onclick="event.stopPropagation(); shareItem('{{ item.name|escapejs }}', {% if item.is_project %}'project'{% else %}'team-request'{% endif %}, {{ item.id }})"
+                                        title="Share this {% if item.is_project %}project{% else %}team request{% endif %}">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <span class="share-feedback" id="share-feedback-{{ item.id }}" style="display: none; font-size: 14px; color: var(--success);">Link copied!</span>
+                                {% else %}
+                                <button class="like-btn" disabled style="color: var(--text-light); cursor: not-allowed;" title="Likes not available for team requests">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                                <span class="like-count">N/A</span>
+                                <button class="like-btn share-btn" 
+                                        onclick="event.stopPropagation(); shareItem('{{ item.name|escapejs }}', 'team-request', {{ item.id }})"
+                                        title="Share this team request">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <span class="share-feedback" id="share-feedback-{{ item.id }}" style="display: none; font-size: 14px; color: var(--success);">Link copied!</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
                 {% empty %}
                 <div class="no-projects">
                     <i class="fas fa-folder-open"></i>
@@ -1720,6 +1712,26 @@
             }
         }
 
+        function markNotificationsAsRead() {
+            fetch('/mark_notifications_read/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'Success') {
+                    const badges = document.querySelectorAll('.notification-badge');
+                    badges.forEach(badge => badge.style.display = 'none');
+                }
+            })
+            .catch(error => {
+                console.error('Error marking notifications as read:', error);
+            });
+        }
+
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -1741,7 +1753,7 @@
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
                     target.scrollIntoView({
-                        behavior: 'smooth',
+                        behavior: 'smooth', 
                         block: 'start'
                     });
                 }
