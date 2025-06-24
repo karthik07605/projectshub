@@ -6,7 +6,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-((oq0ob-b7*(05)tvj+tada1-6pi1z6vv_z85z9*z#!q=fw)yj'
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['*','projectszone.pythonanywhere.com','projects-zone.onrender.com']
 
 SECURE_SSL_REDIRECT = True
@@ -115,7 +115,7 @@ AUTHENTICATION_BACKENDS = (
 
 SITE_ID = 1
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
