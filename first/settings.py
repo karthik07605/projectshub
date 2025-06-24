@@ -11,6 +11,8 @@ ALLOWED_HOSTS = ['*','projectszone.pythonanywhere.com','projects-zone.onrender.c
 
 SECURE_SSL_REDIRECT = True
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
