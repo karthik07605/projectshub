@@ -43,35 +43,43 @@ Our mission is to foster a community-driven platform where anyone can:
 
 ## 📸 Images
 
-
-
 ### **Main Page**
 
 <img width="1919" height="909" alt="Screenshot 2025-07-18 154521" src="https://github.com/user-attachments/assets/f10ff921-1459-481e-b877-bb35a68e776c" />
-
 
 <span style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #888;">
 > The landing page where users discover featured projects, learn about platform features, and access primary navigation options.
 </span>
 
+---
 
 ### **Login Page Screenshot**
 
 <img width="1919" height="909" alt="Screenshot 2025-07-18 154537" src="https://github.com/user-attachments/assets/ea960745-9a6c-4cd4-b2e4-df615af72ad4" />
 
-
 <span style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #888;">
-Personal dashboard displaying user details, linked GitHub account, and all uploaded or collaborative projects.
+> Secure login and registration page for accessing your project dashboard and features.
 </span>
 
+---
+
+### **OTP Verification Page**
+
+<img width="1499" height="825" alt="Screenshot 2025-07-18 201528" src="https://github.com/user-attachments/assets/a45133cc-b7cd-4a70-9322-37878abb2958" />
+
+
+<span style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #888;">
+> Secure Email OTP verification to ensure trusted user access and account security during registration.
+</span>
+
+---
 
 ### **User Profile Page**
 
 <img width="1900" height="914" alt="Screenshot 2025-07-18 154635" src="https://github.com/user-attachments/assets/7dda1485-38a6-4725-a06e-8f4d465bb388" />
 
-
 <span style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #888;">
-Personal dashboard displaying user details, linked GitHub account, and all uploaded or collaborative projects.
+> Personal dashboard displaying user details, linked GitHub account, and all uploaded or collaborative projects.
 </span>
 
 ---
@@ -81,7 +89,17 @@ Personal dashboard displaying user details, linked GitHub account, and all uploa
 <img width="1919" height="911" alt="Screenshot 2025-07-18 154609" src="https://github.com/user-attachments/assets/65049dc2-d684-42a0-89aa-aa81c35dfff3" />
 <img width="1917" height="907" alt="Screenshot 2025-07-18 155911" src="https://github.com/user-attachments/assets/5c1a5c5a-3d66-4e5d-b064-b549355c063e" />
 
+<span style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #888;">
+> Comprehensive overview showcasing project description, tech stack, contributors, and collaboration options.
+</span>
+
+---
+
+### **Team Request View**
+
+
+<img width="1899" height="910" alt="Screenshot 2025-07-18 201732" src="https://github.com/user-attachments/assets/b8103aad-0cec-44e5-96cc-c993a5a138b9" />
 
 <span style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #888;">
-Comprehensive overview showcasing project description, tech stack, contributors, and collaboration options.
+> View and manage requests from users who want to join your project’s team—accept or decline collaborators for better project management.
 </span>
