@@ -171,6 +171,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://code-demo-82rc.onrender.com',
     'http://code-demo-82rc.onrender.com',
     'https://projects-zone.onrender.com',
+    'https://projectshub-taii.onrender.com',
 ]
 CSRF_COOKIE_SECURE = True
 
@@ -187,6 +188,7 @@ LOGGING = {
         },
     },
 }
+
 
 
 
