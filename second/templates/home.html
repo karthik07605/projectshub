@@ -228,7 +228,7 @@
             z-index: -1;
         }
 
-        .user-icon:hover::before, .notification-icon:hover::before {
+        .user-icon:hover::before, .notification-icon::before {
             transform: scale(1);
         }
 
@@ -1449,9 +1449,9 @@
                    style="text-decoration: none; color: inherit;">
                     <div class="project-card" data-type="{{ item.type }}" data-name="{{ item.name|lower }}" data-author="{{ item.user.profile.name|lower }}">
                         {% if item.image_urls %}
-                            <img src="{{ item.image_urls.0 }}" alt="{{ item.name }}" class="project-image" onerror="this.src='https://via.placeholder.com/320x200/dbeafe/3b82f6?text=Image+Not+Found';">
+                            <img src="{{ item.image_urls.0 }}" alt="{{ item.name }}" class="project-image" loading="lazy" onerror="this.src='https://placehold.co/320x200/f0f7ff/3b82f6?text=Image+Not+Found';">
                         {% elif item.type == 'teamrequests' %}
-                            <img src="https://res.cloudinary.com/dxs85zu0x/image/upload/v1750584169/project_Uploads/ChatGPT%20Image%20Jun%2022%2C%202025%2C%2002_50_34%20PM.png.png" alt="{{ item.name }}" class="project-image">
+                            <img src="https://res.cloudinary.com/dxs85zu0x/image/upload/v1750584169/project_Uploads/ChatGPT%20Image%20Jun%2022%2C%202025%2C%2002_50_34%20PM.png.png" alt="{{ item.name }}" class="project-image" loading="lazy">
                         {% else %}
                             <div class="project-image" style="background: linear-gradient(135deg, #dbeafe, #f1f5f9); display:flex; align-items:center; justify-content:center; font-weight:600; color:#64748b; font-size:16px; text-align:center;">
                                 <i class="fas fa-image" style="font-size: 32px; margin-bottom: 8px; display: block;"></i>
@@ -1468,13 +1468,13 @@
                             <div class="like-section">
                                 {% if item.is_project %}
                                 <button class="like-btn" 
-                                        onclick="event.stopPropagation(); toggleLike({{ item.id }}, this, '{{ user.is_authenticated|yesno:"true,false" }}')" 
+                                        onclick="event.preventDefault(); event.stopPropagation(); toggleLike({{ item.id }}, this, '{{ user.is_authenticated|yesno:"true,false" }}')" 
                                         style="{% if user.is_authenticated and item.id in liked_projects %}color: #dc2626;{% endif %}">
                                     <i class="fas fa-heart"></i>
                                 </button>
                                 <span class="like-count">{{ item.like_count }} Likes</span>
                                 <button class="like-btn share-btn" 
-                                        onclick="event.stopPropagation(); shareItem('{{ item.name|escapejs }}', {% if item.is_project %}'project'{% else %}'team-request'{% endif %}, {{ item.id }})"
+                                        onclick="event.preventDefault(); event.stopPropagation(); shareItem('{{ item.name|escapejs }}', {% if item.is_project %}'project'{% else %}'team-request'{% endif %}, {{ item.id }})"
                                         title="Share this {% if item.is_project %}project{% else %}team request{% endif %}">
                                     <i class="fas fa-share-alt"></i>
                                 </button>
@@ -1485,7 +1485,7 @@
                                 </button>
                                 <span class="like-count">N/A</span>
                                 <button class="like-btn share-btn" 
-                                        onclick="event.stopPropagation(); shareItem('{{ item.name|escapejs }}', 'team-request', {{ item.id }})"
+                                        onclick="event.preventDefault(); event.stopPropagation(); shareItem('{{ item.name|escapejs }}', 'team-request', {{ item.id }})"
                                         title="Share this team request">
                                     <i class="fas fa-share-alt"></i>
                                 </button>

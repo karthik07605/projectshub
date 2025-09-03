@@ -84,7 +84,7 @@
         }
 
         .project-title {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
             margin-bottom: 16px;
             position: relative;
@@ -118,37 +118,84 @@
             }
         }
 
-        .project-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
+        .image-section {
             margin-bottom: 16px;
+            position: relative;
+        }
+
+        .main-image-container {
+            width: 100%;
+            max-height: 500px;
+            overflow: hidden;
+            border-radius: 10px;
             box-shadow: 0 4px 12px var(--shadow-sm);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--light-gray);
+        }
+
+        .main-image {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 10px;
             transition: transform 0.4s ease;
         }
 
-        .project-image:hover {
+        .main-image:hover {
             transform: scale(1.02);
+        }
+
+        .image-gallery {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            margin-top: 10px;
+            padding-bottom: 10px;
+            scroll-behavior: smooth;
+            justify-content: center;
+        }
+
+        .gallery-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--shadow-xs);
+            transition: transform 0.3s ease, border 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .gallery-image:hover {
+            transform: scale(1.05);
+            border: 2px solid var(--secondary-color);
+        }
+
+        .gallery-image.active {
+            border: 2px solid var(--primary-color);
         }
 
         .no-image {
             width: 100%;
-            max-height: 400px;
+            max-height: 500px;
             background: var(--light-gray);
             border-radius: 10px;
             margin-bottom: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 16px;
             color: var(--text-secondary);
             font-weight: 500;
             box-shadow: 0 4px 12px var(--shadow-sm);
         }
 
         .project-meta {
-            font-size: 15px;
+            font-size: 17px;
             color: var(--text-secondary);
             margin-bottom: 12px;
         }
@@ -158,19 +205,29 @@
             color: var(--text-primary);
         }
 
-        .project-description {
-            font-size: 16px;
+        .project-links {
+            margin-bottom: 16px;
+        }
+
+        .project-links .link-group {
+            margin-bottom: 12px;
+        }
+
+        .project-links .label {
+            font-size: 17px;
+            font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 20px;
+            margin-bottom: 8px;
+            display: block;
         }
 
         .github-link, .hosted-link {
-            font-size: 14px;
+            font-size: 16px;
             color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
             display: inline-block;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
             transition: color 0.3s ease;
         }
 
@@ -184,7 +241,7 @@
         }
 
         .video-section h2 {
-            font-size: 20px;
+            font-size: 22px;
             color: var(--text-primary);
             margin-bottom: 12px;
             position: relative;
@@ -207,6 +264,11 @@
             animation: underlineGrow 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
         }
 
+        .video-container {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
         .video-section video {
             width: 100%;
             max-height: 400px;
@@ -219,11 +281,96 @@
             transform: scale(1.02);
         }
 
+        .video-controls {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .play-pause-btn, .fullscreen-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px var(--shadow-sm);
+        }
+
+        .play-pause-btn::before, .fullscreen-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .play-pause-btn:hover::before, .fullscreen-btn:hover::before {
+            left: 100%;
+        }
+
+        .play-pause-btn:hover, .fullscreen-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px var(--shadow-md);
+        }
+
+        .play-pause-btn:active, .fullscreen-btn:active {
+            transform: translateY(0);
+            background: var(--primary-color);
+        }
+
+        .play-pause-btn:focus, .fullscreen-btn:focus {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: 2px;
+        }
+
+        .video-progress-container {
+            margin-top: 8px;
+            width: 100%;
+            background: var(--border-light);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px var(--shadow-xs);
+        }
+
+        .video-progress-bar {
+            width: 0%;
+            height: 10px;
+            background: var(--gradient-primary);
+            transition: width 0.4s ease-in-out;
+            position: relative;
+        }
+
+        .video-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: progress-shine 1.5s infinite;
+        }
+
+        @keyframes progress-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
         button {
             padding: 12px 20px;
             border-radius: 10px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 15px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
@@ -321,7 +468,7 @@
             }
 
             .project-title {
-                font-size: 22px;
+                font-size: 26px;
             }
 
             .project-title::after {
@@ -330,23 +477,39 @@
                 bottom: -4px;
             }
 
-            .project-image, .no-image {
-                max-height: 300px;
-                border-radius: 8px;
+            .main-image-container, .no-image {
+                max-height: 400px;
+            }
+
+            .main-image {
+                max-height: 400px;
+            }
+
+            .image-gallery {
+                gap: 8px;
+            }
+
+            .gallery-image {
+                width: 80px;
+                height: 80px;
             }
 
             .project-meta {
-                font-size: 12px;
+                font-size: 14px;
                 margin-bottom: 10px;
             }
 
-            .project-description {
+            .project-links .label {
                 font-size: 14px;
+            }
+
+            .project-description {
+                font-size: 15px;
                 margin-bottom: 16px;
             }
 
             .github-link, .hosted-link {
-                font-size: 12px;
+                font-size: 13px;
             }
 
             .video-section {
@@ -354,7 +517,7 @@
             }
 
             .video-section h2 {
-                font-size: 12px;
+                font-size: 14px;
             }
 
             .video-section h2::after {
@@ -368,9 +531,28 @@
                 border-radius: 8px;
             }
 
+            .video-controls {
+                gap: 6px;
+            }
+
+            .play-pause-btn, .fullscreen-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+                border-radius: 6px;
+            }
+
+            .video-progress-container {
+                margin-top: 6px;
+                border-radius: 8px;
+            }
+
+            .video-progress-bar {
+                height: 8px;
+            }
+
             button {
                 padding: 10px 16px;
-                font-size: 10px;
+                font-size: 12px;
                 border-radius: 8px;
                 min-width: 44px;
                 min-height: 44px;
@@ -387,12 +569,66 @@
             }
 
             .project-title {
-                font-size: 20px;
+                font-size: 22px;
+            }
+
+            .main-image-container, .no-image {
+                max-height: 300px;
+            }
+
+            .main-image {
+                max-height: 300px;
+            }
+
+            .image-gallery {
+                gap: 6px;
+            }
+
+            .gallery-image {
+                width: 60px;
+                height: 60px;
+            }
+
+            .project-meta {
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+
+            .project-links .label {
+                font-size: 12px;
+            }
+
+            .project-description {
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+
+            .github-link, .hosted-link {
+                font-size: 11px;
+            }
+
+            .video-controls {
+                gap: 4px;
+            }
+
+            .play-pause-btn, .fullscreen-btn {
+                padding: 5px 10px;
+                font-size: 10px;
+                border-radius: 5px;
+            }
+
+            .video-progress-container {
+                margin-top: 5px;
+                border-radius: 6px;
+            }
+
+            .video-progress-bar {
+                height: 6px;
             }
 
             button {
                 padding: 8px 12px;
-                font-size: 8px;
+                font-size: 10px;
                 border-radius: 6px;
                 min-width: 40px;
                 min-height: 40px;
@@ -409,12 +645,66 @@
             }
 
             .project-title {
-                font-size: 16px;
+                font-size: 18px;
+            }
+
+            .main-image-container, .no-image {
+                max-height: 200px;
+            }
+
+            .main-image {
+                max-height: 200px;
+            }
+
+            .image-gallery {
+                gap: 4px;
+            }
+
+            .gallery-image {
+                width: 50px;
+                height: 50px;
+            }
+
+            .project-meta {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+
+            .project-links .label {
+                font-size: 10px;
+            }
+
+            .project-description {
+                font-size: 11px;
+                margin-bottom: 12px;
+            }
+
+            .github-link, .hosted-link {
+                font-size: 9px;
+            }
+
+            .video-controls {
+                gap: 3px;
+            }
+
+            .play-pause-btn, .fullscreen-btn {
+                padding: 4px 8px;
+                font-size: 8px;
+                border-radius: 4px;
+            }
+
+            .video-progress-container {
+                margin-top: 4px;
+                border-radius: 4px;
+            }
+
+            .video-progress-bar {
+                height: 4px;
             }
 
             button {
                 padding: 6px 10px;
-                font-size: 7px;
+                font-size: 8px;
                 border-radius: 5px;
                 min-width: 36px;
                 min-height: 36px;
@@ -444,6 +734,19 @@
             ::-webkit-scrollbar {
                 width: 4px;
             }
+
+            .image-gallery::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .image-gallery::-webkit-scrollbar-thumb {
+                background: var(--secondary-color);
+                border-radius: 3px;
+            }
+
+            .image-gallery::-webkit-scrollbar-track {
+                background: var(--light-gray);
+            }
         }
     </style>
 </head>
@@ -452,47 +755,169 @@
         <div class="main-content">
             <div class="project-details">
                 <h1 class="project-title">{{ project.name }}</h1>
-                {% if project.images_list %}
-                    {% for url in project.images_list %}
-                    <img src="{{ url }}" loading="lazy" alt="{{ project.name }}" class="project-image" onerror="this.src='https://via.placeholder.com/300x400?text=Image+Failed';">
-                    {% endfor %}
-                {% else %}
-                <div class="no-image">No Image</div>
-                {% endif %}
+                <div class="image-section">
+                    {% if project.images_list %}
+                        <div class="main-image-container">
+                            <img src="{{ project.images_list|first }}" loading="lazy" alt="{{ project.name }}" class="main-image" onerror="this.src='https://via.placeholder.com/300x400?text=Image+Failed';">
+                        </div>
+                        {% if project.images_list|length > 1 %}
+                            <div class="image-gallery">
+                                {% for url in project.images_list %}
+                                    <img src="{{ url }}" loading="lazy" alt="{{ project.name }}" class="gallery-image {% if forloop.first %}active{% endif %}" onclick="changeMainImage(this)">
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="no-image">No Image</div>
+                    {% endif %}
+                </div>
                 <p class="project-meta"><span class="label">Type:</span> {{ project.type }}</p>
                 <p class="project-meta"><span class="label">By:</span> {{ project.user.profile.name }}</p>
                 <p class="project-meta"><span class="label">Email:</span> {{ project.user.email }}</p>
                 <p class="project-meta"><span class="label">Date:</span> {{ project.created_at|date:"F d, Y H:i" }}</p>
-                <p class="project-meta"><span class="label">Likes:</span> {{ project.like_count }}</p>
-                {% if project.github_link %}
-                    <a href="{{ project.github_link }}" class="github-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-                {% endif %}
-                {% if project.hosted_link %}
-                    <a href="{{ project.hosted_link }}" class="hosted-link" target="_blank" rel="noopener noreferrer">Visit Hosted Project</a>
-                {% endif %}
+                <p class="project-meta"><span class="label">Likes:</span> <span class="like-count">{{ project.like_count }}</span></p>
+                <div class="project-links">
+                    {% if project.github_link %}
+                        <div class="link-group">
+                            <span class="label">GitHub Link:</span>
+                            <a href="{{ project.github_link }}" class="github-link" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+                        </div>
+                    {% endif %}
+                    {% if project.hosted_link %}
+                        <div class="link-group">
+                            <span class="label">Hosted Link:</span>
+                            <a href="{{ project.hosted_link }}" class="hosted-link" target="_blank" rel="noopener noreferrer">Visit Hosted Project</a>
+                        </div>
+                    {% endif %}
+                </div>
                 <p class="project-description">{{ project.description }}</p>
                 {% if project.videos_list %}
                     <div class="video-section">
                         <h2>Videos</h2>
                         {% for video_url in project.videos_list %}
-                        <video class="project-video" preload="none" poster="https://via.placeholder.com/300x400?text=Click+to+Play" controls>
-                            <source src="{{ video_url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
+                            <div class="video-container" data-video-url="{{ video_url }}">
+                                <video class="project-video" preload="none" poster="https://via.placeholder.com/300x400?text=Click+to+Play" controls>
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="video-controls">
+                                    <button type="button" class="play-pause-btn" aria-label="Play video">Play</button>
+                                    <button type="button" class="fullscreen-btn" aria-label="Toggle fullscreen">Fullscreen</button>
+                                </div>
+                                <div class="video-progress-container">
+                                    <div class="video-progress-bar"></div>
+                                </div>
+                            </div>
                         {% endfor %}
                     </div>
                 {% endif %}
                 {% if user.is_authenticated %}
-                    <button type="button" class="like-btn {% if is_liked %}liked{% endif %}" id="like-btn" data-project-id="{{ project.id }}">
+                    <button type="button" class="like-btn {% if is_liked %}liked{% endif %}" id="like-btn" data-project-id="{{ project.id }}" aria-label="{% if is_liked %}Unlike project{% else %}Like project{% endif %}">
                         {% if is_liked %}Unlike{% else %}Like{% endif %}
                     </button>
                 {% endif %}
-                <button type="button" class="back-btn" onclick="window.location.href='/'">Back</button>
+                <button type="button" class="back-btn" onclick="pauseAllVideos(); window.location.href='/'" aria-label="Go back">Back</button>
             </div>
         </div>
     </main>
-    {% if user.is_authenticated %}
     <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (const cookie of cookies) {
+                    const trimmedCookie = cookie.trim();
+                    if (trimmedCookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(trimmedCookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function changeMainImage(element) {
+            const mainImage = document.querySelector('.main-image');
+            const galleryImages = document.querySelectorAll('.gallery-image');
+            mainImage.src = element.src;
+            galleryImages.forEach(img => img.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function pauseAllVideos() {
+            document.querySelectorAll('.project-video').forEach(video => {
+                video.pause();
+            });
+        }
+
+        document.querySelectorAll('.video-container').forEach(container => {
+            const video = container.querySelector('.project-video');
+            const playPauseBtn = container.querySelector('.play-pause-btn');
+            const fullscreenBtn = container.querySelector('.fullscreen-btn');
+            const progressBar = container.querySelector('.video-progress-bar');
+            const videoUrl = container.dataset.videoUrl;
+
+            // Lazy load video on play button click
+            playPauseBtn.addEventListener('click', () => {
+                if (!video.querySelector('source')) {
+                    const source = document.createElement('source');
+                    source.src = videoUrl;
+                    source.type = 'video/mp4';
+                    video.appendChild(source);
+                    video.load();
+                }
+
+                if (video.paused) {
+                    // Pause all other videos
+                    pauseAllVideos();
+                    video.play();
+                    playPauseBtn.textContent = 'Pause';
+                    playPauseBtn.setAttribute('aria-label', 'Pause video');
+                } else {
+                    video.pause();
+                    playPauseBtn.textContent = 'Play';
+                    playPauseBtn.setAttribute('aria-label', 'Play video');
+                }
+            });
+
+            // Toggle fullscreen
+            fullscreenBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    video.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+
+            // Update progress bar
+            video.addEventListener('timeupdate', () => {
+                const progress = (video.currentTime / video.duration) * 100;
+                progressBar.style.width = `${progress}%`;
+            });
+
+            // Reset progress bar when video ends
+            video.addEventListener('ended', () => {
+                progressBar.style.width = '0%';
+                playPauseBtn.textContent = 'Play';
+                playPauseBtn.setAttribute('aria-label', 'Play video');
+            });
+
+            // Keyboard accessibility
+            playPauseBtn.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    playPauseBtn.click();
+                }
+            });
+
+            fullscreenBtn.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    fullscreenBtn.click();
+                }
+            });
+        });
+
+        {% if user.is_authenticated %}
         document.getElementById('like-btn').addEventListener('click', function() {
             const projectId = this.getAttribute('data-project-id');
             const isLiked = this.classList.contains('liked');
@@ -511,41 +936,18 @@
                 if (data.status === 'Success') {
                     button.textContent = data.action === 'liked' ? 'Unlike' : 'Like';
                     button.classList.toggle('liked');
-                    const likeCountElement = document.querySelector('.project-meta .label:contains("Likes:")').parentElement;
-                    likeCountElement.innerHTML = `<span class="label">Likes:</span> ${data.like_count}`;
+                    button.setAttribute('aria-label', data.action === 'liked' ? 'Unlike project' : 'Like project');
+                    const likeCountElement = document.querySelector('.like-count');
+                    likeCountElement.textContent = data.like_count;
                 } else {
                     alert(data.message);
                 }
-            })
-            
+            });
         });
+        {% endif %}
 
-        // Function to get CSRF token from cookies
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        // jQuery-like :contains selector for vanilla JS
-        (function() {
-            const elements = document.getElementsByTagName('*');
-            for (let i = 0; i < elements.length; i++) {
-                if (elements[i].textContent.includes('Likes:')) {
-                    elements[i].classList.add('contains-likes');
-                }
-            }
-        })();
+        // Pause videos when navigating away
+        window.addEventListener('beforeunload', pauseAllVideos);
     </script>
-    {% endif %}
 </body>
 </html>

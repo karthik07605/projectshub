@@ -15,26 +15,26 @@
         }
 
         :root {
-            --primary-color: #4a73c0; /* Soft pastel blue */
-            --secondary-color: #7ea3f0; /* Lighter pastel blue */
-            --accent-color: #b3c9f8; /* Very light blue */
-            --light-gray: #f0f2f5; /* Light gray for borders */
-            --lighter-gray: #f8f9fb; /* Almost white */
-            --text-primary: #1f2a3c; /* Soft dark gray */
-            --text-secondary: #6b7280; /* Light gray text */
-            --text-light: #9ca3af; /* Lighter gray text */
-            --bg-primary: #ffffff; /* White main background */
-            --bg-secondary: #ffffff; /* White for cards */
+            --primary-color: #4a73c0;
+            --secondary-color: #7ea3f0;
+            --accent-color: #b3c9f8;
+            --light-gray: #f0f2f5;
+            --lighter-gray: #f8f9fb;
+            --text-primary: #1f2a3c;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --bg-primary: #ffffff;
+            --bg-secondary: #ffffff;
             --bg-card: #ffffff;
-            --border-color: #e5e7eb; /* Very light gray */
-            --border-light: #f3f4f6; /* Almost white border */
-            --shadow-xs: rgba(74, 115, 192, 0.08); /* Soft blue shadow */
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --shadow-xs: rgba(74, 115, 192, 0.08);
             --shadow-sm: rgba(74, 115, 192, 0.12);
             --shadow-md: rgba(74, 115, 192, 0.18);
             --shadow-lg: rgba(74, 115, 192, 0.25);
             --shadow-xl: rgba(74, 115, 192, 0.35);
-            --gradient-primary: linear-gradient(135deg, #4a73c0 0%, #7ea3f0 100%); /* Soft blue gradient */
-            --gradient-light: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%); /* White to light gray */
+            --gradient-primary: linear-gradient(135deg, #4a73c0 0%, #7ea3f0 100%);
+            --gradient-light: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%);
             --gradient-card: linear-gradient(135deg, #ffffff 0%, #f8f9fb 100%);
         }
 
@@ -472,9 +472,7 @@
             {% for project in user_projects %}
             <div class="project-card" onclick="viewProject({{ project.id }})">
                 {% if project.images_list %}
-                    {% for image_url in project.images_list %}
-                        <img src="{{ image_url }}" alt="{{ project.name }}" class="project-image">
-                    {% endfor %}
+                    <img src="{{ project.images_list|first }}" alt="{{ project.name }}" class="project-image" onerror="this.src='https://via.placeholder.com/300x400?text=Image+Failed';">
                 {% else %}
                     <div class="no-image">No Image</div>
                 {% endif %}
