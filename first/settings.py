@@ -1,17 +1,13 @@
 from pathlib import Path
 import cloudinary
 import os
-
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-((oq0ob-b7*(05)tvj+tada1-6pi1z6vv_z85z9*z#!q=fw)yj'
-DEBUG = False
-ALLOWED_HOSTS = ['*','projectszone.pythonanywhere.com','projects-zone.onrender.com']
-
-SECURE_SSL_REDIRECT = True
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+SECRET_KEY = config("SECRET_KEY")
+DEBUG = config("DEBUG", default=True, cast=bool)
+ALLOWED_HOSTS = ['*', 'projectszone.pythonanywhere.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,7 +22,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'cloudinary',
 
     'second',
 ]
@@ -62,16 +57,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'first.wsgi.application'
 
+# Default SQLite DB
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Uncomment if using PostgreSQL
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'NAME': config("DB_NAME"),
+        'USER': config("DB_USER"),
+        'PASSWORD': config("DB_PASSWORD"),
+        'HOST': config("DB_HOST"),
+        'PORT': config("DB_PORT"),
     }
 }
+"""
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -88,6 +94,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -97,16 +104,16 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = 'Projects Zone<karthik07605kk@gmail.com>'
-SITE_URL = 'https://projects-zone.onrender.com/'
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = f'Projects Zone <{EMAIL_HOST_USER}>'
+SITE_URL = 'http://127.0.0.1:8000'
 
 # Cloudinary Configuration
 cloudinary.config(
-    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.environ.get('CLOUDINARY_API_KEY'),
-    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+    cloud_name=config("CLOUDINARY_CLOUD_NAME"),
+    api_key=config("CLOUDINARY_API_KEY"),
+    api_secret=config("CLOUDINARY_API_SECRET"),
 )
 
 # Allauth Configuration
@@ -142,8 +149,8 @@ SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_LOGIN = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
-            'secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
+            'client_id': config("GOOGLE_CLIENT_ID"),
+            'secret': config("GOOGLE_CLIENT_SECRET"),
         },
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
@@ -160,7 +167,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 CSRF_TRUSTED_ORIGINS = [
     'https://code-demo-82rc.onrender.com',
     'http://code-demo-82rc.onrender.com',
-    'https://projects-zone.onrender.com',
 ]
 CSRF_COOKIE_SECURE = True
 
