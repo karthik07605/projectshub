@@ -25,7 +25,7 @@ urlpatterns = [
     path('clear-next-session/', clear_next_session, name='clear_next_session'),
     path('change-password/', change_password, name='change_password'),
     path('user-project/<int:project_id>/', user_project_detail, name='user_project_detail'),
-    path('edit-project/', edit_project, name='edit_project'),
+    path('edit-project/<int:project_id>/', edit_project, name='edit_project'),
     path('delete-project/', delete_project, name='delete_project'),
     # Team member request URLs
     path('request-team-members/', request_team_members, name='request_team_members'),

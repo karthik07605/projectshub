@@ -11,7 +11,7 @@ from .utils import send_otp_email
 from django.middleware.csrf import get_token
 from .cloudinary_utils import upload_to_cloudinary
 import logging
-import re,os
+import re, os
 import cloudinary
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
@@ -441,7 +441,8 @@ def upload_project(request):
         hosted_link = request.POST.get('hosted_link', '')
         images = request.FILES.getlist('images')
         videos = request.FILES.getlist('videos')
-        
+        main_image_index = request.POST.get('main_image_index', '0')
+
         if not name or not project_type:
             return JsonResponse({'status': 'Failed', 'message': 'Project name and type are required'}, status=400)
         if not images:
@@ -455,22 +456,41 @@ def upload_project(request):
 
         try:
             image_urls = []
-            for image in images:
-                # Generate file_name from the original file name, sanitized
-                file_name = os.path.splitext(image.name)[0].replace(' ', '_').lower()
-                image_url = upload_to_cloudinary(image, file_name, resource_type='image')
+            try:
+                main_image_index = int(main_image_index)
+                if main_image_index < 0 or main_image_index >= len(images):
+                    logger.warning(f"Invalid main_image_index {main_image_index} for {len(images)} images")
+                    main_image_index = 0
+            except ValueError:
+                logger.warning(f"Invalid main_image_index format: {main_image_index}")
+                main_image_index = 0
+
+            # Upload main image first
+            if images:
+                main_image = images[main_image_index]
+                file_name = os.path.splitext(main_image.name)[0].replace(' ', '_').lower()
+                image_url = upload_to_cloudinary(main_image, file_name, resource_type='image')
                 if image_url:
                     image_urls.append(image_url)
                 else:
-                    logger.error(f"Failed to upload image for project {name} by {request.user.username}")
-                    return JsonResponse({'status': 'Failed', 'message': 'Failed to upload image(s)'}, status=500)
+                    logger.error(f"Failed to upload main image for project {name} by {request.user.username}")
+                    return JsonResponse({'status': 'Failed', 'message': 'Failed to upload main image'}, status=500)
+                # Upload other images
+                for i, image in enumerate(images):
+                    if i != main_image_index:
+                        file_name = os.path.splitext(image.name)[0].replace(' ', '_').lower()
+                        image_url = upload_to_cloudinary(image, file_name, resource_type='image')
+                        if image_url:
+                            image_urls.append(image_url)
+                        else:
+                            logger.error(f"Failed to upload image for project {name} by {request.user.username}")
+                            return JsonResponse({'status': 'Failed', 'message': 'Failed to upload image(s)'}, status=500)
 
             video_urls = []
             for video in videos:
                 if video.size > 10 * 1024 * 1024:  # 10MB limit
                     logger.warning(f"Video file too large for project {name} by {request.user.username}: {video.name}")
                     return JsonResponse({'status': 'Failed', 'message': f'Video {video.name} exceeds 10MB limit'}, status=400)
-                # Generate file_name for video
                 file_name = os.path.splitext(video.name)[0].replace(' ', '_').lower()
                 video_url = upload_to_cloudinary(video, file_name, resource_type='video')
                 if video_url:
@@ -518,10 +538,14 @@ def edit_project(request, project_id):
         hosted_link = request.POST.get('hosted_link', '')
         images = request.FILES.getlist('images')
         videos = request.FILES.getlist('videos')
-        
+        delete_images = request.POST.getlist('delete_images')
+        delete_videos = request.POST.getlist('delete_videos')
+        main_image_index = request.POST.get('main_image_index', '0')
+
         if not name or not project_type:
             return JsonResponse({'status': 'Failed', 'message': 'Project name and type are required'}, status=400)
-        if not images and not project.image_urls:
+        image_urls = project.image_urls.split(',') if project.image_urls else []
+        if not images and not image_urls and delete_images and len(delete_images) >= len(image_urls):
             return JsonResponse({'status': 'Failed', 'message': 'At least one image is required'}, status=400)
         if github_link and not re.match(r'^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+$', github_link):
             logger.warning(f"Invalid GitHub link provided by {request.user.username}: {github_link}")
@@ -531,63 +555,113 @@ def edit_project(request, project_id):
             return JsonResponse({'status': 'Failed', 'message': 'Invalid Project Hosted link format'}, status=400)
 
         try:
-            image_urls = project.image_urls.split(',') if project.image_urls else []
+            # Handle image deletion
+            if delete_images:
+                for url in delete_images:
+                    if url in image_urls:
+                        image_urls.remove(url)
+                        try:
+                            public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
+                            if public_id_match:
+                                public_id = public_id_match.group(1)
+                                result = cloudinary.uploader.destroy(public_id, resource_type='image')
+                                if result.get('result') == 'ok':
+                                    logger.info(f"Deleted Cloudinary image: {public_id}")
+                                else:
+                                    logger.warning(f"Failed to delete Cloudinary image {public_id}: {result}")
+                        except Exception as e:
+                            logger.warning(f"Error deleting Cloudinary image {url}: {str(e)}")
+
+            # Handle new images
+            new_image_urls = []
             if images:
-                # Delete existing images from Cloudinary
-                for url in image_urls:
-                    if url.strip():
-                        try:
-                            public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
-                            if public_id_match:
-                                public_id = public_id_match.group(1)
-                                cloudinary.uploader.destroy(public_id, resource_type='image')
-                                logger.info(f"Deleted Cloudinary image: {public_id}")
-                        except Exception as e:
-                            logger.warning(f"Failed to delete Cloudinary image {url}: {str(e)}")
-                image_urls = []
-                for image in images:
-                    # Generate file_name for image
-                    file_name = os.path.splitext(image.name)[0].replace(' ', '_').lower()
-                    image_url = upload_to_cloudinary(image, file_name, resource_type='image')
-                    if image_url:
-                        image_urls.append(image_url)
+                try:
+                    main_image_index = int(main_image_index)
+                    if main_image_index < 0 or main_image_index >= len(images):
+                        logger.warning(f"Invalid main_image_index {main_image_index} for {len(images)} new images")
+                        main_image_index = 0
+                    # Upload main image first
+                    main_image = images[main_image_index]
+                    file_name = os.path.splitext(main_image.name)[0].replace(' ', '_').lower()
+                    main_image_url = upload_to_cloudinary(main_image, file_name, resource_type='image')
+                    if main_image_url:
+                        new_image_urls.append(main_image_url)
                     else:
-                        logger.error(f"Failed to upload image for project {name} by {request.user.username}")
-                        return JsonResponse({'status': 'Failed', 'message': 'Failed to upload image(s)'}, status=500)
-            
+                        logger.error(f"Failed to upload main image for project {name} by {request.user.username}")
+                        return JsonResponse({'status': 'Failed', 'message': 'Failed to upload main image'}, status=500)
+                    # Upload other images
+                    for i, image in enumerate(images):
+                        if i != main_image_index:
+                            file_name = os.path.splitext(image.name)[0].replace(' ', '_').lower()
+                            image_url = upload_to_cloudinary(image, file_name, resource_type='image')
+                            if image_url:
+                                new_image_urls.append(image_url)
+                            else:
+                                logger.error(f"Failed to upload image for project {name} by {request.user.username}")
+                                return JsonResponse({'status': 'Failed', 'message': 'Failed to upload image(s)'}, status=500)
+                except ValueError:
+                    # If main_image_index is for existing images
+                    main_image_index = int(main_image_index)
+                    if main_image_index >= 0 and main_image_index < len(image_urls):
+                        main_image_url = image_urls.pop(main_image_index)
+                        image_urls.insert(0, main_image_url)
+                    else:
+                        logger.warning(f"Invalid main_image_index {main_image_index} for {len(image_urls)} existing images")
+            else:
+                # Reorder existing images based on main_image_index
+                try:
+                    main_image_index = int(main_image_index)
+                    if main_image_index >= 0 and main_image_index < len(image_urls):
+                        main_image_url = image_urls.pop(main_image_index)
+                        image_urls.insert(0, main_image_url)
+                    else:
+                        logger.warning(f"Invalid main_image_index {main_image_index} for {len(image_urls)} existing images")
+                except ValueError:
+                    logger.warning(f"Invalid main_image_index format: {main_image_index}")
+
+            # Combine new and existing images
+            image_urls = new_image_urls + image_urls if new_image_urls else image_urls
+
+            # Handle video deletion
             video_urls = project.video_urls.split(',') if project.video_urls else []
-            if videos:
-                # Delete existing videos from Cloudinary
-                for url in video_urls:
-                    if url.strip():
+            if delete_videos:
+                for url in delete_videos:
+                    if url in video_urls:
+                        video_urls.remove(url)
                         try:
                             public_id_match = re.search(r'/upload/(?:v\d+/)?(.+?)(?:\.\w+)?$', url)
                             if public_id_match:
                                 public_id = public_id_match.group(1)
-                                cloudinary.uploader.destroy(public_id, resource_type='video')
-                                logger.info(f"Deleted Cloudinary video: {public_id}")
+                                result = cloudinary.uploader.destroy(public_id, resource_type='video')
+                                if result.get('result') == 'ok':
+                                    logger.info(f"Deleted Cloudinary video: {public_id}")
+                                else:
+                                    logger.warning(f"Failed to delete Cloudinary video {public_id}: {result}")
                         except Exception as e:
-                            logger.warning(f"Failed to delete Cloudinary video {url}: {str(e)}")
-                video_urls = []
+                            logger.warning(f"Error deleting Cloudinary video {url}: {str(e)}")
+
+            # Handle new videos
+            new_video_urls = []
+            if videos:
                 for video in videos:
                     if video.size > 10 * 1024 * 1024:  # 10MB limit
                         logger.warning(f"Video file too large for project {name} by {request.user.username}: {video.name}")
                         return JsonResponse({'status': 'Failed', 'message': f'Video {video.name} exceeds 10MB limit'}, status=400)
-                    # Generate file_name for video
                     file_name = os.path.splitext(video.name)[0].replace(' ', '_').lower()
                     video_url = upload_to_cloudinary(video, file_name, resource_type='video')
                     if video_url:
-                        video_urls.append(video_url)
+                        new_video_urls.append(video_url)
                     else:
                         logger.error(f"Failed to upload video for project {name} by {request.user.username}")
                         return JsonResponse({'status': 'Failed', 'message': 'Failed to upload video(s)'}, status=500)
+            video_urls = new_video_urls + video_urls if new_video_urls else video_urls
 
             project.name = name
             project.type = project_type
             project.description = description
             project.github_link = github_link if github_link else None
             project.hosted_link = hosted_link if hosted_link else None
-            project.image_urls = ','.join(image_urls)
+            project.image_urls = ','.join(image_urls) if image_urls else ''
             project.video_urls = ','.join(video_urls) if video_urls else None
             project.save()
             
@@ -595,7 +669,7 @@ def edit_project(request, project_id):
             return JsonResponse({
                 'status': 'Success',
                 'message': 'Project updated successfully',
-                'redirect': '/uploaded-projects/'
+                'redirect': f'/user-project/{project.id}/'
             })
         except Exception as e:
             logger.error(f"Error editing project {project_id} for user {request.user.username}: {str(e)}")
@@ -682,13 +756,14 @@ def toggle_like(request):
         })
     return JsonResponse({'status': 'Failed', 'message': 'Method not allowed'}, status=405)
 
-@login_required
+@login_required(login_url='/login/')
 def user_project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     if project.user != request.user:
         logger.warning(f"User {request.user.username} attempted to access project {project_id} they do not own")
         return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to view this project'}, status=403)
-    return render(request, 'user_project_detail.html', {'project': project})
+    is_liked = Like.objects.filter(user=request.user, project=project).exists()
+    return render(request, 'user_project_detail.html', {'project': project, 'is_liked': is_liked})
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -825,11 +900,3 @@ def change_password(request):
         logger.warning(f"Invalid current password for user {request.user.username}")
         return JsonResponse({'status': 'Failed', 'message': 'Current password is incorrect'}, status=400)
     return render(request, 'change-password.html')
-
-@login_required
-def user_project_detail(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    if project.user != request.user:
-        logger.warning(f"User {request.user.username} attempted to access project {project_id} they do not own")
-        return JsonResponse({'status': 'Failed', 'message': 'You do not have permission to view this project'}, status=403)
-    return render(request, 'user_project_detail.html', {'project': project})
